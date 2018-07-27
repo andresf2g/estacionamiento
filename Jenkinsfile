@@ -31,6 +31,7 @@ pipeline {
                           submoduleCfg                     : [],
                           userRemoteConfigs                : [[credentialsId: 'GitHub_andresf2g',
                                                                url          : 'https://github.com/andresf2g/estacionamiento']]])
+                sh 'gradle --b ./build.gradle compileJava'            
             }
         }
         stage('Unit Tests') {
