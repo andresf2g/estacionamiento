@@ -30,7 +30,7 @@ pipeline {
                           gitTool                          : 'Git_Centos',
                           submoduleCfg                     : [],
                           userRemoteConfigs                : [[credentialsId: 'GitHub_andresf2g',
-                                                               url          : 'https://github.com/andresf2g/practica']]])
+                                                               url          : 'https://github.com/andresf2g/estacionamiento']]])
             }
         }
         stage('Unit Tests') {
@@ -46,9 +46,6 @@ pipeline {
         stage('Static Code Analysis') {
             steps {
                 echo '------------>Análisis de código estático<------------'
-                withSonarQubeEnv('Sonar') {
-                    sh "${tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'}/bin/sonar-scanner -Dproject.settings=sonar-project.properties"
-                }
             }
         }
         stage('Build') {
