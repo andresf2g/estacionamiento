@@ -36,6 +36,7 @@ pipeline {
         stage('Unit Tests') {
             steps {
                 echo "------------>Unit Tests<------------"
+                sh 'gradle test'
             }
         }
         stage('Integration Tests') {
@@ -54,6 +55,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo "------------>Build<------------"
+                sh 'gradle --b ./build.gradle build -x test'
             }
         }
     }
