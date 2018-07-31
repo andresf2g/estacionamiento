@@ -33,12 +33,6 @@ pipeline {
                                                                url          : 'https://github.com/andresf2g/estacionamiento']]])
             }
         }
-        stage('Compile') {
-            steps {
-                echo "------------>Compile<------------"
-                sh 'gradle --b ./build.gradle compileJava'            
-            }
-        }
         stage('Unit Tests') {
             steps {
                 echo "------------>Unit Tests<------------"
