@@ -42,13 +42,12 @@ pipeline {
         stage('Unit Tests') {
             steps {
                 echo "------------>Unit Tests<------------"
-                sh 'gradle --b ./build.gradle test --tests co.com.ceiba.estacionamiento.unit*'
+                sh 'gradle --b ./build.gradle test'
             }
         }
         stage('Integration Tests') {
             steps {
                 echo "------------>Integration Tests<------------"
-                sh 'gradle --b ./build.gradle test --tests co.com.ceiba.estacionamiento.integration*'
             }
         }
         stage('Static Code Analysis') {
