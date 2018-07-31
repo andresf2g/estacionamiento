@@ -31,24 +31,19 @@ pipeline {
                           submoduleCfg                     : [],
                           userRemoteConfigs                : [[credentialsId: 'GitHub_andresf2g',
                                                                url          : 'https://github.com/andresf2g/estacionamiento']]])
-                //sh 'gradle --b ./build.gradle compileJava'            
+                sh 'gradle --b ./build.gradle compileJava'            
             }
         }
         stage('Unit Tests') {
             steps {
                 echo "------------>Unit Tests<------------"
-                sh 'gradle --b ./build.gradle test'
+                sh 'gradle --b ./build.gradle test --tests co.com.ceiba.estacionamiento.unit*'
             }
         }
         stage('Integration Tests') {
             steps {
                 echo "------------>Integration Tests<------------"
-            }
-        }
-        stage('Build') {
-            steps {
-                echo "------------>Build<------------"
-                sh 'gradle --b ./build.gradle build -x test'
+                sh 'gradle --b ./build.gradle test --tests co.com.ceiba.estacionamiento.integration*'
             }
         }
         stage('Static Code Analysis') {
@@ -57,6 +52,12 @@ pipeline {
                 withSonarQubeEnv('Sonar') {
                     sh "${tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'}/bin/sonar-scanner -Dproject.settings=sonar-project.properties"
                 }
+            }
+        }
+        stage('Build') {
+            steps {
+                echo "------------>Build<------------"
+                sh 'gradle --b ./build.gradle build -x test'
             }
         }
     }

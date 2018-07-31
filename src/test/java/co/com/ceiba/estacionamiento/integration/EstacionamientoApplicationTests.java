@@ -1,4 +1,4 @@
-package co.com.ceiba.estacionamiento;
+package co.com.ceiba.estacionamiento.integration;
 
 import org.junit.Before;
 import org.junit.Test;
