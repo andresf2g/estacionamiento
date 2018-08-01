@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,16 +24,21 @@ import co.com.ceiba.estacionamiento.business.VigilanteService;
 
 @RestController
 public class EstacionamientoController {
+	Log logger = LogFactory.getLog(this.getClass());
+	
 	@Autowired
 	private VigilanteService servicioVigilante;
 	
 	@RequestMapping("/estacionamiento/listarVehiculosParqueados")
 	public ResponseEntity<List<VehiculoRequestBody>> listarVehiculosParqueados(@RequestParam(required=false) String tipoVehiculo) {
-		TipoVehiculo tipo;
-		try {
-			tipo = TipoVehiculo.valueOf(tipoVehiculo);
-		} catch (Exception e) {
-			tipo = null;
+		TipoVehiculo tipo = null;
+		if (tipoVehiculo != null) {
+			try {
+				tipo = TipoVehiculo.valueOf(tipoVehiculo);
+			} catch (Exception e) {
+				logger.error("El tipo de vehiculo indicado no está indicado");
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
 		}
 		List<VehiculoRequestBody> resultadoVehiculos = new ArrayList<>();
 		servicioVigilante.listarVehiculosParqueados(tipo).stream().forEach(v -> resultadoVehiculos.add(new VehiculoRequestBody(v.getPlaca(), v.getTipoVehiculo().toString(), v.getCilindraje(), v.getFechaIngreso())));
@@ -50,6 +57,7 @@ public class EstacionamientoController {
 			servicioVigilante.registrarIngresoVehiculo(new Vehiculo(vehiculo.getPlaca(), vehiculo.getCilindraje(), TipoVehiculo.valueOf(vehiculo.getTipoVehiculo()), ingreso));
 			return new ResponseEntity<>(HttpStatus.OK);
 		} catch (VigilanteServiceException e) {
+			logger.info("Excepcion de negocio generada: " + e.getMessage());
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
 	}
@@ -65,6 +73,7 @@ public class EstacionamientoController {
 		try {
 			return new ResponseEntity<>(servicioVigilante.registrarEgresoVehiculo(vehiculoBody.getPlaca(), egreso).toString(), HttpStatus.OK);
 		} catch (VigilanteServiceException e) {
+			logger.info("Excepcion de negocio generada: " + e.getMessage());
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
 	}
