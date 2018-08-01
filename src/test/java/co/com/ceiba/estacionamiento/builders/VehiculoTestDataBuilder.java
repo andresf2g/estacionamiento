@@ -14,6 +14,7 @@ public abstract class VehiculoTestDataBuilder {
 	protected Integer cilindraje;
 	protected TipoVehiculo tipoVehiculo;
 	protected Date fechaIngreso;
+	protected String prefijoPlaca;
 	
 	public VehiculoTestDataBuilder() {
 		try {
@@ -45,6 +46,10 @@ public abstract class VehiculoTestDataBuilder {
 			this.fechaIngreso = new Date();
 		}
 		return this;
+	}
+	
+	public String getPrefijoPlaca() {
+		return this.prefijoPlaca;
 	}
 	
 	public Vehiculo build() {

@@ -15,6 +15,7 @@ import co.com.ceiba.estacionamiento.EstacionamientoApplication;
 import co.com.ceiba.estacionamiento.builders.CarroTestDataBuilder;
 import co.com.ceiba.estacionamiento.builders.MotoTestDataBuilder;
 import co.com.ceiba.estacionamiento.builders.VehiculoTestDataBuilder;
+import co.com.ceiba.estacionamiento.business.TipoVehiculo;
 import co.com.ceiba.estacionamiento.business.Vehiculo;
 import co.com.ceiba.estacionamiento.business.VigilanteService;
 import co.com.ceiba.estacionamiento.business.VigilanteServiceException;
@@ -32,7 +33,7 @@ public class VigilanteTests {
 	
 	private void insertarNVehiculos(VehiculoTestDataBuilder vehiculoBuilder, int n) {
 		for (int i = 0; i < n; i++) {
-			vehiculoBuilder.conPlaca("CDE45" + i);
+			vehiculoBuilder.conPlaca(vehiculoBuilder.getPrefijoPlaca() + "45" + i);
 			servicioVigilante.registrarIngresoVehiculo(vehiculoBuilder.build());
 		}
 	}
@@ -246,5 +247,18 @@ public class VigilanteTests {
 		BigDecimal valorPagar = servicioVigilante.registrarEgresoVehiculo(moto.getPlaca(), parsearFecha("2018-07-11 13:50"));
 		
 		Assert.assertEquals(8000, valorPagar.doubleValue(), 0);
+	}
+	
+	@Test
+	public void listarVehiculosParqueadosTest() {
+		servicioVigilante.evacuarVehiculosParqueados();
+		VehiculoTestDataBuilder carroBuilder = new CarroTestDataBuilder();
+		insertarNVehiculos(carroBuilder, 6);
+		carroBuilder = new MotoTestDataBuilder();
+		insertarNVehiculos(carroBuilder, 3);
+		
+		Assert.assertEquals(9, servicioVigilante.listarVehiculosParqueados(null).size());
+		Assert.assertEquals(6, servicioVigilante.listarVehiculosParqueados(TipoVehiculo.CARRO).size());
+		Assert.assertEquals(3, servicioVigilante.listarVehiculosParqueados(TipoVehiculo.MOTO).size());
 	}
 }
