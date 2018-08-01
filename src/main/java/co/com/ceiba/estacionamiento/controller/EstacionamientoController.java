@@ -36,7 +36,7 @@ public class EstacionamientoController {
 			try {
 				tipo = TipoVehiculo.valueOf(tipoVehiculo);
 			} catch (Exception e) {
-				logger.error("El tipo de vehiculo indicado no está indicado");
+				logger.error(e);
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			}
 		}
@@ -57,7 +57,7 @@ public class EstacionamientoController {
 			servicioVigilante.registrarIngresoVehiculo(new Vehiculo(vehiculo.getPlaca(), vehiculo.getCilindraje(), TipoVehiculo.valueOf(vehiculo.getTipoVehiculo()), ingreso));
 			return new ResponseEntity<>(HttpStatus.OK);
 		} catch (VigilanteServiceException e) {
-			logger.info("Excepcion de negocio generada: " + e.getMessage());
+			logger.info(e);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
 	}
@@ -73,7 +73,7 @@ public class EstacionamientoController {
 		try {
 			return new ResponseEntity<>(servicioVigilante.registrarEgresoVehiculo(vehiculoBody.getPlaca(), egreso).toString(), HttpStatus.OK);
 		} catch (VigilanteServiceException e) {
-			logger.info("Excepcion de negocio generada: " + e.getMessage());
+			logger.info(e);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
 	}
