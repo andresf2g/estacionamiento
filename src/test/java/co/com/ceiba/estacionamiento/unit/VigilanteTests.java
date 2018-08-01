@@ -1,7 +1,6 @@
 package co.com.ceiba.estacionamiento.unit;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.junit.Assert;
@@ -10,10 +9,9 @@ import org.junit.Test;
 import co.com.ceiba.estacionamiento.business.Vigilante;
 
 public class VigilanteTests {
-	private final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-
+	
 	private Date parsearFecha(String fecha) throws ParseException {
-		return SDF.parse(fecha);
+		return Vigilante.formatoFecha().parse(fecha);
 	}
 	
 	@Test

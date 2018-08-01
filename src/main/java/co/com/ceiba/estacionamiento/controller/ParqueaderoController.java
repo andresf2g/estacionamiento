@@ -29,7 +29,7 @@ public class ParqueaderoController {
 	public void registrarIngresoVehiculo(@PathVariable String placa, @PathVariable String tipoVehiculo, @PathVariable Integer cilindraje, @PathVariable String fechaIngreso) {
 		Date ingreso;
 		try {
-			ingreso = Vigilante.SDF.parse(fechaIngreso);
+			ingreso = Vigilante.formatoFecha().parse(fechaIngreso);
 		} catch (ParseException e) {
 			ingreso = new Date();
 		}
@@ -41,7 +41,7 @@ public class ParqueaderoController {
 		Vehiculo vehiculo = servicioVigilante.buscarVehiculoParqueado(placa);
 		Date egreso;
 		try {
-			egreso = Vigilante.SDF.parse(fechaEgreso);
+			egreso = Vigilante.formatoFecha().parse(fechaEgreso);
 		} catch (ParseException e) {
 			egreso = new Date();
 		}

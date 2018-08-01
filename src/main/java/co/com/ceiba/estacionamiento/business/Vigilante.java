@@ -6,8 +6,6 @@ import java.util.Date;
 
 public class Vigilante {
 
-	public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-	
 	public int[] calcularTiempoDiferencia(Date fechaIngreso, Date fechaEgreso) {
 		long timeDifference = fechaEgreso.getTime() - fechaIngreso.getTime();
 		int hours = (int) Math.ceil(((double) timeDifference) / 1000 / 60 / 60);
@@ -29,5 +27,9 @@ public class Vigilante {
 			return calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY || calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY;
 		}
 		return true;
+	}
+	
+	public static SimpleDateFormat formatoFecha() {
+		return new SimpleDateFormat("yyyy-MM-dd HH:mm");
 	}
 }
