@@ -9,40 +9,35 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import co.com.ceiba.estacionamiento.builders.MotoTestDataBuilder;
 import co.com.ceiba.estacionamiento.business.Vehiculo;
-import co.com.ceiba.estacionamiento.business.Vigilante;
 import co.com.ceiba.estacionamiento.business.VigilanteException;
-import co.com.ceiba.estacionamiento.repository.PrecioRepository;
-import co.com.ceiba.estacionamiento.repository.VehiculoRepository;
+import co.com.ceiba.estacionamiento.service.VigilanteService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class VigilanteTests {
 
 	@Autowired
-	private VehiculoRepository repositorioVehiculo;
-	private PrecioRepository repositorioPrecio;
+	private VigilanteService servicioVigilante;
 
 	@Test
 	public void registrarIngresoMotoConParqueaderoDisponibleTest() {
-		repositorioVehiculo.deleteAll();
+		servicioVigilante.evacuarVehiculosParqueados();
 		Vehiculo moto = new MotoTestDataBuilder().build();
 		
-		Vigilante vigilante = new Vigilante(repositorioVehiculo, repositorioPrecio);
-		vigilante.registrarIngresoVehiculo(moto);
+		servicioVigilante.registrarIngresoVehiculo(moto);
 		
-		Assert.assertTrue(repositorioVehiculo.findById(moto.getPlaca()).isPresent());
+		Assert.assertNotNull(servicioVigilante.buscarVehiculoParqueado(moto.getPlaca()));
 	}
 
 	@Test
 	public void registrarIngresoMotoConParqueaderoLlenoTest() {
-		repositorioVehiculo.deleteAll();
+		servicioVigilante.evacuarVehiculosParqueados();
 		MotoTestDataBuilder motoBuilder = new MotoTestDataBuilder();
 		
-		Vigilante vigilante = new Vigilante(repositorioVehiculo, repositorioPrecio);
-		vigilante.registrarIngresoVehiculo(motoBuilder.build());
+		servicioVigilante.registrarIngresoVehiculo(motoBuilder.build());
 		try {
 			motoBuilder.conPlaca("ZTE56D");
-			vigilante.registrarIngresoVehiculo(motoBuilder.build());
+			servicioVigilante.registrarIngresoVehiculo(motoBuilder.build());
 		} catch (VigilanteException e) {
 			Assert.assertEquals(VigilanteException.INDISPONIBILIDAD_PARQUEADERO, e.getMessage());
 		}
