@@ -9,8 +9,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import co.com.ceiba.estacionamiento.builders.MotoTestDataBuilder;
 import co.com.ceiba.estacionamiento.business.Vehiculo;
-import co.com.ceiba.estacionamiento.business.VigilanteException;
-import co.com.ceiba.estacionamiento.service.VigilanteService;
+import co.com.ceiba.estacionamiento.business.VigilanteServiceException;
+import co.com.ceiba.estacionamiento.business.VigilanteService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -38,8 +38,8 @@ public class VigilanteTests {
 		try {
 			motoBuilder.conPlaca("ZTE56D");
 			servicioVigilante.registrarIngresoVehiculo(motoBuilder.build());
-		} catch (VigilanteException e) {
-			Assert.assertEquals(VigilanteException.INDISPONIBILIDAD_PARQUEADERO, e.getMessage());
+		} catch (VigilanteServiceException e) {
+			Assert.assertEquals(VigilanteServiceException.INDISPONIBILIDAD_PARQUEADERO, e.getMessage());
 		}
 	}
 

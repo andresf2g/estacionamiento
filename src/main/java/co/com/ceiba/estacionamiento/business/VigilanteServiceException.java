@@ -1,6 +1,6 @@
 package co.com.ceiba.estacionamiento.business;
 
-public class VigilanteException extends RuntimeException {
+public class VigilanteServiceException extends RuntimeException {
 
 	private static final long serialVersionUID = 2823477504645049167L;
 	
@@ -10,7 +10,7 @@ public class VigilanteException extends RuntimeException {
 	public static final String PLACA_A_DIA_INCORRECTO = "Los vehiculos con placa iniciada en A solo pueden parquear Domingos y Lunes";
 	public static final String PRECIOS_NO_ENCONTRADOS = "No se encontraron precios para el vehiculo";
 
-	public VigilanteException(String message) {
+	public VigilanteServiceException(String message) {
 		super(message);
 	}
 }

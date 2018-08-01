@@ -2,7 +2,7 @@ package co.com.ceiba.estacionamiento.controller;
 
 import java.util.Date;
 
-import co.com.ceiba.estacionamiento.business.Vigilante;
+import co.com.ceiba.estacionamiento.EstacionamientoApplication;
 
 public class VehiculoRequestBody {
 	private String placa;
@@ -18,7 +18,7 @@ public class VehiculoRequestBody {
 		this.placa = placa;
 		this.tipoVehiculo = tipoVehiculo;
 		this.cilindraje = cilindraje;
-		this.fechaIngreso = Vigilante.formatoFecha().format(fechaIngreso);
+		this.fechaIngreso = EstacionamientoApplication.formatoFecha().format(fechaIngreso);
 	}
 
 	public String getPlaca() {

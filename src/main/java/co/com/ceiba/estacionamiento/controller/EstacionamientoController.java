@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import co.com.ceiba.estacionamiento.EstacionamientoApplication;
 import co.com.ceiba.estacionamiento.business.TipoVehiculo;
 import co.com.ceiba.estacionamiento.business.Vehiculo;
-import co.com.ceiba.estacionamiento.business.Vigilante;
-import co.com.ceiba.estacionamiento.business.VigilanteException;
-import co.com.ceiba.estacionamiento.service.VigilanteService;
+import co.com.ceiba.estacionamiento.business.VigilanteServiceException;
+import co.com.ceiba.estacionamiento.business.VigilanteService;
 
 @RestController
 public class EstacionamientoController {
@@ -42,14 +42,14 @@ public class EstacionamientoController {
 	public ResponseEntity<String> registrarIngresoVehiculo(@ModelAttribute VehiculoRequestBody vehiculo) {
 		Date ingreso;
 		try {
-			ingreso = Vigilante.formatoFecha().parse(vehiculo.getFechaIngreso());
+			ingreso = EstacionamientoApplication.formatoFecha().parse(vehiculo.getFechaIngreso());
 		} catch (ParseException e) {
 			ingreso = new Date();
 		}
 		try {
 			servicioVigilante.registrarIngresoVehiculo(new Vehiculo(vehiculo.getPlaca(), vehiculo.getCilindraje(), TipoVehiculo.valueOf(vehiculo.getTipoVehiculo()), ingreso));
 			return new ResponseEntity<>(HttpStatus.OK);
-		} catch (VigilanteException e) {
+		} catch (VigilanteServiceException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
 	}
@@ -58,13 +58,13 @@ public class EstacionamientoController {
 	public ResponseEntity<String> registrarEgresoVehiculo(@ModelAttribute VehiculoRequestBody vehiculoBody) {
 		Date egreso;
 		try {
-			egreso = Vigilante.formatoFecha().parse(vehiculoBody.getFechaEgreso());
+			egreso = EstacionamientoApplication.formatoFecha().parse(vehiculoBody.getFechaEgreso());
 		} catch (ParseException e) {
 			egreso = new Date();
 		}
 		try {
 			return new ResponseEntity<>(servicioVigilante.registrarEgresoVehiculo(vehiculoBody.getPlaca(), egreso).toString(), HttpStatus.OK);
-		} catch (VigilanteException e) {
+		} catch (VigilanteServiceException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
 	}

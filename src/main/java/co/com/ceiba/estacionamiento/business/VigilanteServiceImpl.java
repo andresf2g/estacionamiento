@@ -1,7 +1,8 @@
-package co.com.ceiba.estacionamiento.service;
+package co.com.ceiba.estacionamiento.business;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -9,11 +10,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import co.com.ceiba.estacionamiento.business.TipoPrecio;
-import co.com.ceiba.estacionamiento.business.TipoVehiculo;
-import co.com.ceiba.estacionamiento.business.Vehiculo;
-import co.com.ceiba.estacionamiento.business.Vigilante;
-import co.com.ceiba.estacionamiento.business.VigilanteException;
 import co.com.ceiba.estacionamiento.model.PrecioEntity;
 import co.com.ceiba.estacionamiento.model.VehiculoBuilder;
 import co.com.ceiba.estacionamiento.model.VehiculoEntity;
@@ -27,20 +23,18 @@ public class VigilanteServiceImpl implements VigilanteService {
 	@Autowired
 	private PrecioRepository repositorioPrecio;
 	
-	private Vigilante vigilanteBusiness = new Vigilante();
-	
 	public void registrarIngresoVehiculo(Vehiculo vehiculo) {
-		if (!vigilanteBusiness.vehiculoPlacaDiaCorrecto(vehiculo.getPlaca(), vehiculo.getFechaIngreso())) {
-			throw new VigilanteException(VigilanteException.PLACA_A_DIA_INCORRECTO);
+		if (!vehiculoPlacaDiaCorrecto(vehiculo.getPlaca(), vehiculo.getFechaIngreso())) {
+			throw new VigilanteServiceException(VigilanteServiceException.PLACA_A_DIA_INCORRECTO);
 		}
 		if (vehiculo.getTipoVehiculo().equals(TipoVehiculo.MOTO) && repositorioVehiculo.findByTipoVehiculo(vehiculo.getTipoVehiculo()).size() > 10) {
-			throw new VigilanteException(VigilanteException.INDISPONIBILIDAD_PARQUEADERO);
+			throw new VigilanteServiceException(VigilanteServiceException.INDISPONIBILIDAD_PARQUEADERO);
 		}
 		if (vehiculo.getTipoVehiculo().equals(TipoVehiculo.CARRO) && repositorioVehiculo.findByTipoVehiculo(vehiculo.getTipoVehiculo()).size() > 20) {
-			throw new VigilanteException(VigilanteException.INDISPONIBILIDAD_PARQUEADERO);
+			throw new VigilanteServiceException(VigilanteServiceException.INDISPONIBILIDAD_PARQUEADERO);
 		}
 		if (repositorioVehiculo.findById(vehiculo.getPlaca()).isPresent()) {
-			throw new VigilanteException(VigilanteException.VEHICULO_YA_INGRESADO);
+			throw new VigilanteServiceException(VigilanteServiceException.VEHICULO_YA_INGRESADO);
 		}
 		repositorioVehiculo.save(VehiculoBuilder.convertirAEntity(vehiculo));
 	}
@@ -49,10 +43,10 @@ public class VigilanteServiceImpl implements VigilanteService {
 		BigDecimal valorPagar = BigDecimal.ZERO;
 		Optional<VehiculoEntity> vehiculo = repositorioVehiculo.findById(placa); 
 		if (!vehiculo.isPresent()) {
-			throw new VigilanteException(VigilanteException.VEHICULO_NO_INGRESADO);
+			throw new VigilanteServiceException(VigilanteServiceException.VEHICULO_NO_INGRESADO);
 		}
 		List<PrecioEntity> listaPrecios = repositorioPrecio.findByIdPrecioTipoVehiculo(vehiculo.get().getTipoVehiculo());
-		int[] tiempoParqueo = vigilanteBusiness.calcularTiempoDiferencia(vehiculo.get().getFechaIngreso(), fechaEgreso);
+		int[] tiempoParqueo = calcularTiempoDiferencia(vehiculo.get().getFechaIngreso(), fechaEgreso);
 		if (tiempoParqueo[0] > 0) {
 			/* Tiempo en dias */
 			valorPagar = valorPagar.add(obtenerPrecioParqueo(listaPrecios, TipoPrecio.DIA).multiply(new BigDecimal(tiempoParqueo[0])));
@@ -83,11 +77,11 @@ public class VigilanteServiceImpl implements VigilanteService {
 	
 	private BigDecimal obtenerPrecioParqueo(List<PrecioEntity> listaPrecios, TipoPrecio tipoPrecio) {
 		if (listaPrecios.isEmpty()) {
-			throw new VigilanteException(VigilanteException.PRECIOS_NO_ENCONTRADOS);
+			throw new VigilanteServiceException(VigilanteServiceException.PRECIOS_NO_ENCONTRADOS);
 		}
 		Optional<PrecioEntity> precioEntity = listaPrecios.stream().filter(pe -> pe.getIdPrecio().getTipoPrecio().equals(tipoPrecio)).findFirst();
 		if (!precioEntity.isPresent()) {
-			throw new VigilanteException(VigilanteException.PRECIOS_NO_ENCONTRADOS);
+			throw new VigilanteServiceException(VigilanteServiceException.PRECIOS_NO_ENCONTRADOS);
 		}
 		return precioEntity.get().getValor();
 	}
@@ -103,5 +97,28 @@ public class VigilanteServiceImpl implements VigilanteService {
 			vehiculo = VehiculoBuilder.convertirADominio(vehiculoEntity.get());
 		}
 		return vehiculo;
+	}
+	
+	public int[] calcularTiempoDiferencia(Date fechaIngreso, Date fechaEgreso) {
+		long timeDifference = fechaEgreso.getTime() - fechaIngreso.getTime();
+		int hours = (int) Math.ceil(((double) timeDifference) / 1000 / 60 / 60);
+		if (hours > 8) {
+			if (hours / 24 == 0) {
+				return new int[] { 1, 0 };
+			} else if (hours - ((hours / 24) * 24) > 8) {
+				return new int[] { (hours / 24) + 1, 0 };
+			}
+			return new int[] { hours / 24, hours - ((hours / 24) * 24) };
+		}
+		return new int[] { 0, hours };
+	}
+
+	public boolean vehiculoPlacaDiaCorrecto(String placa, Date fechaIngreso) {
+		if (placa.toUpperCase().startsWith("A")) {
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(fechaIngreso);
+			return calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY || calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY;
+		}
+		return true;
 	}
 }

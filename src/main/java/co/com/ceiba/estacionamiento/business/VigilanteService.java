@@ -1,11 +1,8 @@
-package co.com.ceiba.estacionamiento.service;
+package co.com.ceiba.estacionamiento.business;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-
-import co.com.ceiba.estacionamiento.business.TipoVehiculo;
-import co.com.ceiba.estacionamiento.business.Vehiculo;
 
 public interface VigilanteService {
 	public void registrarIngresoVehiculo(Vehiculo vehiculo);
