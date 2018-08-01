@@ -2,7 +2,7 @@ package co.com.ceiba.estacionamiento.model;
 
 import co.com.ceiba.estacionamiento.business.Vehiculo;
 
-public class VehiculoBuilder {
+public final class VehiculoBuilder {
 
 	private VehiculoBuilder() {
 	}
