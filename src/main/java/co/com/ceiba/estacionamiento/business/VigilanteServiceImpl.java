@@ -27,10 +27,10 @@ public class VigilanteServiceImpl implements VigilanteService {
 		if (!vehiculoPlacaDiaCorrecto(vehiculo.getPlaca(), vehiculo.getFechaIngreso())) {
 			throw new VigilanteServiceException(VigilanteServiceException.PLACA_A_DIA_INCORRECTO);
 		}
-		if (vehiculo.getTipoVehiculo().equals(TipoVehiculo.MOTO) && repositorioVehiculo.findByTipoVehiculo(vehiculo.getTipoVehiculo()).size() > 10) {
+		if (vehiculo.getTipoVehiculo().equals(TipoVehiculo.MOTO) && repositorioVehiculo.findByTipoVehiculo(vehiculo.getTipoVehiculo()).size() >= 10) {
 			throw new VigilanteServiceException(VigilanteServiceException.INDISPONIBILIDAD_PARQUEADERO);
 		}
-		if (vehiculo.getTipoVehiculo().equals(TipoVehiculo.CARRO) && repositorioVehiculo.findByTipoVehiculo(vehiculo.getTipoVehiculo()).size() > 20) {
+		if (vehiculo.getTipoVehiculo().equals(TipoVehiculo.CARRO) && repositorioVehiculo.findByTipoVehiculo(vehiculo.getTipoVehiculo()).size() >= 20) {
 			throw new VigilanteServiceException(VigilanteServiceException.INDISPONIBILIDAD_PARQUEADERO);
 		}
 		if (repositorioVehiculo.findById(vehiculo.getPlaca()).isPresent()) {
