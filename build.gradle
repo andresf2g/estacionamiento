@@ -36,8 +36,8 @@ dependencies {
 test {
 	jacoco {
 		append = false
-		destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
+		destinationFile = file("build/jacoco/jacocoTest.exec")
 	}
-	reports.junitXml.destination = file("$buildDir/jacoco/test-results")
+	reports.junitXml.destination = file("build/jacoco/test-results")
 }
 jacocoTestReport.dependsOn(test)
