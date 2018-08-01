@@ -9,7 +9,7 @@ import co.com.ceiba.estacionamiento.business.Vehiculo;
 
 public interface VigilanteService {
 	public void registrarIngresoVehiculo(Vehiculo vehiculo);
-	public BigDecimal registrarEgresoVehiculo(Vehiculo vehiculo, Date fechaEgreso);
+	public BigDecimal registrarEgresoVehiculo(String placa, Date fechaEgreso);
 	public List<Vehiculo> listarVehiculosParqueados(TipoVehiculo tipoVehiculo);
 	public void evacuarVehiculosParqueados();
 	public Vehiculo buscarVehiculoParqueado(String placa);

@@ -45,13 +45,14 @@ public class VigilanteServiceImpl implements VigilanteService {
 		repositorioVehiculo.save(VehiculoBuilder.convertirAEntity(vehiculo));
 	}
 
-	public BigDecimal registrarEgresoVehiculo(Vehiculo vehiculo, Date fechaEgreso) {
+	public BigDecimal registrarEgresoVehiculo(String placa, Date fechaEgreso) {
 		BigDecimal valorPagar = BigDecimal.ZERO;
-		if (!repositorioVehiculo.findById(vehiculo.getPlaca()).isPresent()) {
+		Optional<VehiculoEntity> vehiculo = repositorioVehiculo.findById(placa); 
+		if (!vehiculo.isPresent()) {
 			throw new VigilanteException(VigilanteException.VEHICULO_NO_INGRESADO);
 		}
-		List<PrecioEntity> listaPrecios = repositorioPrecio.findByIdPrecioTipoVehiculo(vehiculo.getTipoVehiculo());
-		int[] tiempoParqueo = vigilanteBusiness.calcularTiempoDiferencia(vehiculo.getFechaIngreso(), fechaEgreso);
+		List<PrecioEntity> listaPrecios = repositorioPrecio.findByIdPrecioTipoVehiculo(vehiculo.get().getTipoVehiculo());
+		int[] tiempoParqueo = vigilanteBusiness.calcularTiempoDiferencia(vehiculo.get().getFechaIngreso(), fechaEgreso);
 		if (tiempoParqueo[0] > 0) {
 			/* Tiempo en dias */
 			valorPagar = valorPagar.add(obtenerPrecioParqueo(listaPrecios, TipoPrecio.DIA).multiply(new BigDecimal(tiempoParqueo[0])));
@@ -60,11 +61,11 @@ public class VigilanteServiceImpl implements VigilanteService {
 			/* Tiempo horas */
 			valorPagar = valorPagar.add(obtenerPrecioParqueo(listaPrecios, TipoPrecio.HORA).multiply(new BigDecimal(tiempoParqueo[1])));
 		}
-		if (vehiculo.getTipoVehiculo().equals(TipoVehiculo.MOTO) && vehiculo.getCilindraje() > 500) {
+		if (vehiculo.get().getTipoVehiculo().equals(TipoVehiculo.MOTO) && vehiculo.get().getCilindraje() > 500) {
 			/* Precio adicional por motos con cilindraje mayor */
 			valorPagar = valorPagar.add(obtenerPrecioParqueo(listaPrecios, TipoPrecio.ADICIONAL));
 		}
-		repositorioVehiculo.deleteById(vehiculo.getPlaca());
+		repositorioVehiculo.deleteById(placa);
 		return valorPagar;
 	}
 	
