@@ -14,11 +14,14 @@ public class VehiculoRequestBody {
 	public VehiculoRequestBody() {
 	}
 	
-	public VehiculoRequestBody(String placa, String tipoVehiculo, Integer cilindraje, Date fechaIngreso) {
+	public VehiculoRequestBody(String placa, String tipoVehiculo, Integer cilindraje, Date fechaIngreso, Date fechaEgreso) {
 		this.placa = placa;
 		this.tipoVehiculo = tipoVehiculo;
 		this.cilindraje = cilindraje;
 		this.fechaIngreso = EstacionamientoApplication.formatoFecha().format(fechaIngreso);
+		if (fechaEgreso != null) {
+			this.fechaEgreso = EstacionamientoApplication.formatoFecha().format(fechaEgreso);
+		}
 	}
 
 	public String getPlaca() {

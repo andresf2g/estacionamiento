@@ -6,6 +6,7 @@ import java.util.Date;
 import co.com.ceiba.estacionamiento.EstacionamientoApplication;
 import co.com.ceiba.estacionamiento.business.TipoVehiculo;
 import co.com.ceiba.estacionamiento.business.Vehiculo;
+import co.com.ceiba.estacionamiento.controller.VehiculoRequestBody;
 
 public abstract class VehiculoTestDataBuilder {
 	private static final String FECHA_INGRESO = "2018-07-10 10:00";
@@ -14,6 +15,7 @@ public abstract class VehiculoTestDataBuilder {
 	protected Integer cilindraje;
 	protected TipoVehiculo tipoVehiculo;
 	protected Date fechaIngreso;
+	protected Date fechaEgreso;
 	protected String prefijoPlaca;
 	
 	public VehiculoTestDataBuilder() {
@@ -48,11 +50,24 @@ public abstract class VehiculoTestDataBuilder {
 		return this;
 	}
 	
+	public VehiculoTestDataBuilder conFechaEgreso(String fechaEgreso) {
+		try {
+			this.fechaEgreso = EstacionamientoApplication.formatoFecha().parse(fechaEgreso);
+		} catch (ParseException e) {
+			this.fechaEgreso = new Date();
+		}
+		return this;
+	}
+	
 	public String getPrefijoPlaca() {
 		return this.prefijoPlaca;
 	}
 	
 	public Vehiculo build() {
 		return new Vehiculo(this.placa, this.cilindraje, this.tipoVehiculo, this.fechaIngreso);
+	}
+	
+	public VehiculoRequestBody buildBody() {
+		return new VehiculoRequestBody(this.placa, this.tipoVehiculo.toString(), this.cilindraje, this.fechaIngreso, this.fechaEgreso);
 	}
 }

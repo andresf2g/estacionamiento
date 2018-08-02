@@ -41,20 +41,20 @@ public class EstacionamientoController {
 			}
 		}
 		List<VehiculoRequestBody> resultadoVehiculos = new ArrayList<>();
-		servicioVigilante.listarVehiculosParqueados(tipo).stream().forEach(v -> resultadoVehiculos.add(new VehiculoRequestBody(v.getPlaca(), v.getTipoVehiculo().toString(), v.getCilindraje(), v.getFechaIngreso())));
+		servicioVigilante.listarVehiculosParqueados(tipo).stream().forEach(v -> resultadoVehiculos.add(new VehiculoRequestBody(v.getPlaca(), v.getTipoVehiculo().toString(), v.getCilindraje(), v.getFechaIngreso(), null)));
 		return new ResponseEntity<>(resultadoVehiculos, HttpStatus.OK);
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/estacionamiento/registrarIngresoVehiculo")
-	public ResponseEntity<String> registrarIngresoVehiculo(@ModelAttribute VehiculoRequestBody vehiculo) {
+	public ResponseEntity<String> registrarIngresoVehiculo(@ModelAttribute VehiculoRequestBody vehiculoBody) {
 		Date ingreso;
 		try {
-			ingreso = EstacionamientoApplication.formatoFecha().parse(vehiculo.getFechaIngreso());
+			ingreso = EstacionamientoApplication.formatoFecha().parse(vehiculoBody.getFechaIngreso());
 		} catch (ParseException e) {
 			ingreso = new Date();
 		}
 		try {
-			servicioVigilante.registrarIngresoVehiculo(new Vehiculo(vehiculo.getPlaca(), vehiculo.getCilindraje(), TipoVehiculo.valueOf(vehiculo.getTipoVehiculo()), ingreso));
+			servicioVigilante.registrarIngresoVehiculo(new Vehiculo(vehiculoBody.getPlaca(), vehiculoBody.getCilindraje(), TipoVehiculo.valueOf(vehiculoBody.getTipoVehiculo()), ingreso));
 			return new ResponseEntity<>(HttpStatus.OK);
 		} catch (VigilanteServiceException e) {
 			LOGGER.info(e);
