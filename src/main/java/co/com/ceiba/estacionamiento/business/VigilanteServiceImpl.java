@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,8 @@ import co.com.ceiba.estacionamiento.repository.VehiculoRepository;
 
 @Service
 public class VigilanteServiceImpl implements VigilanteService {
+	private static final Log LOGGER = LogFactory.getLog(VigilanteServiceImpl.class);
+	
 	@Autowired
 	private VehiculoRepository repositorioVehiculo;
 	@Autowired
@@ -45,6 +49,7 @@ public class VigilanteServiceImpl implements VigilanteService {
 		try {
 			egreso = EstacionamientoApplication.formatoFecha().parse(fechaEgreso);
 		} catch (Exception e) {
+			LOGGER.info(e);
 			egreso = new Date();
 		}
 		BigDecimal valorPagar = BigDecimal.ZERO;
@@ -76,6 +81,7 @@ public class VigilanteServiceImpl implements VigilanteService {
 			try {
 				tipo = TipoVehiculo.valueOf(tipoVehiculo);
 			} catch (Exception e) {
+				LOGGER.error(e);
 				throw new VigilanteServiceException(VigilanteServiceException.TIPO_VEHICULO);
 			}
 		}

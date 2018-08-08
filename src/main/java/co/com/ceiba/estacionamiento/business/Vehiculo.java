@@ -2,9 +2,14 @@ package co.com.ceiba.estacionamiento.business;
 
 import java.util.Date;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import co.com.ceiba.estacionamiento.EstacionamientoApplication;
 
 public class Vehiculo {
+	private static final Log LOGGER = LogFactory.getLog(Vehiculo.class);
+	
 	private String placa;
 	private Integer cilindraje;
 	private TipoVehiculo tipoVehiculo;
@@ -26,6 +31,7 @@ public class Vehiculo {
 		try {
 			this.fechaIngreso = EstacionamientoApplication.formatoFecha().parse(fechaIngreso);
 		} catch (Exception e) {
+			LOGGER.info(e);
 			this.fechaIngreso = new Date();
 		}
 	}
