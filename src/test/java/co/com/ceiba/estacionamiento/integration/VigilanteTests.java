@@ -1,8 +1,13 @@
 package co.com.ceiba.estacionamiento.integration;
 
-import java.text.ParseException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
-import org.junit.Assert;
+import java.text.ParseException;
+import java.util.List;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +47,7 @@ public class VigilanteTests {
 		
 		controladorEstacionamiento.registrarIngresoVehiculo(moto.buildBody());
 		
-		Assert.assertNotNull(servicioVigilante.buscarVehiculoParqueado(moto.build().getPlaca()));
+		assertNotNull(servicioVigilante.buscarVehiculoParqueado(moto.build().getPlaca()));
 	}
 	
 	@Test
@@ -52,7 +57,7 @@ public class VigilanteTests {
 		
 		controladorEstacionamiento.registrarIngresoVehiculo(carro.buildBody());
 		
-		Assert.assertNotNull(servicioVigilante.buscarVehiculoParqueado(carro.build().getPlaca()));
+		assertNotNull(servicioVigilante.buscarVehiculoParqueado(carro.build().getPlaca()));
 	}
 	
 	@Test
@@ -62,9 +67,9 @@ public class VigilanteTests {
 		insertarNVehiculos(motoBuilder, 10);
 		motoBuilder.conPlaca("ZTE56D");
 
-		ResponseEntity<String> ingreso = controladorEstacionamiento.registrarIngresoVehiculo(motoBuilder.buildBody());
+		ResponseEntity<List<String>> ingreso = controladorEstacionamiento.registrarIngresoVehiculo(motoBuilder.buildBody());
 		
-		Assert.assertEquals(VigilanteServiceException.INDISPONIBILIDAD_PARQUEADERO, ingreso.getBody());
+		assertEquals(VigilanteServiceException.INDISPONIBILIDAD_PARQUEADERO, ingreso.getBody().get(0));
 	}
 
 	@Test
@@ -74,9 +79,9 @@ public class VigilanteTests {
 		insertarNVehiculos(carroBuilder, 20);
 		carroBuilder.conPlaca("ZTE568");
 
-		ResponseEntity<String> ingreso = controladorEstacionamiento.registrarIngresoVehiculo(carroBuilder.buildBody());
+		ResponseEntity<List<String>> ingreso = controladorEstacionamiento.registrarIngresoVehiculo(carroBuilder.buildBody());
 		
-		Assert.assertEquals(VigilanteServiceException.INDISPONIBILIDAD_PARQUEADERO, ingreso.getBody());
+		assertEquals(VigilanteServiceException.INDISPONIBILIDAD_PARQUEADERO, ingreso.getBody().get(0));
 	}
 
 	@Test
@@ -86,7 +91,7 @@ public class VigilanteTests {
 		
 		controladorEstacionamiento.registrarIngresoVehiculo(carro.buildBody());
 		
-		Assert.assertNotNull(servicioVigilante.buscarVehiculoParqueado(carro.build().getPlaca()));
+		assertNotNull(servicioVigilante.buscarVehiculoParqueado(carro.build().getPlaca()));
 	}
 
 	@Test
@@ -94,9 +99,9 @@ public class VigilanteTests {
 		servicioVigilante.evacuarVehiculosParqueados();
 		VehiculoTestDataBuilder carro = new CarroTestDataBuilder().conPlaca("ABC854").conFechaIngreso("2018-07-03 09:30");
 		
-		ResponseEntity<String> ingreso = controladorEstacionamiento.registrarIngresoVehiculo(carro.buildBody());
+		ResponseEntity<List<String>> ingreso = controladorEstacionamiento.registrarIngresoVehiculo(carro.buildBody());
 		
-		Assert.assertEquals(VigilanteServiceException.PLACA_A_DIA_INCORRECTO, ingreso.getBody());
+		assertEquals(VigilanteServiceException.PLACA_A_DIA_INCORRECTO, ingreso.getBody().get(0));
 	}
 	
 	@Test
@@ -105,9 +110,9 @@ public class VigilanteTests {
 		VehiculoTestDataBuilder carro = new CarroTestDataBuilder();
 		servicioVigilante.registrarIngresoVehiculo(carro.build());
 		
-		ResponseEntity<String> ingreso = controladorEstacionamiento.registrarIngresoVehiculo(carro.buildBody());
+		ResponseEntity<List<String>> ingreso = controladorEstacionamiento.registrarIngresoVehiculo(carro.buildBody());
 		
-		Assert.assertEquals(VigilanteServiceException.VEHICULO_YA_INGRESADO, ingreso.getBody());
+		assertEquals(VigilanteServiceException.VEHICULO_YA_INGRESADO, ingreso.getBody().get(0));
 	}
 
 	@Test
@@ -119,7 +124,7 @@ public class VigilanteTests {
 		
 		controladorEstacionamiento.registrarEgresoVehiculo(carro.buildBody());
 
-		Assert.assertNull(servicioVigilante.buscarVehiculoParqueado(carro.build().getPlaca()));
+		assertNull(servicioVigilante.buscarVehiculoParqueado(carro.build().getPlaca()));
 	}
 
 	@Test
@@ -127,9 +132,9 @@ public class VigilanteTests {
 		servicioVigilante.evacuarVehiculosParqueados();
 		VehiculoTestDataBuilder carro = new CarroTestDataBuilder().conFechaEgreso("2018-05-06 14:40");
 		
-		ResponseEntity<String> egreso = controladorEstacionamiento.registrarEgresoVehiculo(carro.buildBody());
+		ResponseEntity<List<String>> egreso = controladorEstacionamiento.registrarEgresoVehiculo(carro.buildBody());
 		
-		Assert.assertEquals(VigilanteServiceException.VEHICULO_NO_INGRESADO, egreso.getBody());
+		assertEquals(VigilanteServiceException.VEHICULO_NO_INGRESADO, egreso.getBody().get(0));
 	}
 	
 	private void registrarEgresoVehiculoGenerico(VehiculoTestDataBuilder vehiculoBuilder, String fechaEgreso, boolean cilindrajeSuperior, String valorEsperado) {
@@ -140,9 +145,9 @@ public class VigilanteTests {
 		servicioVigilante.registrarIngresoVehiculo(vehiculoBuilder.build());
 		vehiculoBuilder.conFechaEgreso(fechaEgreso);
 		
-		ResponseEntity<String> egreso = controladorEstacionamiento.registrarEgresoVehiculo(vehiculoBuilder.buildBody());
+		ResponseEntity<List<String>> egreso = controladorEstacionamiento.registrarEgresoVehiculo(vehiculoBuilder.buildBody());
 		
-		Assert.assertEquals(valorEsperado, egreso.getBody());
+		assertEquals(valorEsperado, egreso.getBody().get(0));
 	}
 	
 	private void registrarEgresoVehiculoGenerico(VehiculoTestDataBuilder vehiculoBuilder, String fechaEgreso, String valorEsperado) {
@@ -202,10 +207,15 @@ public class VigilanteTests {
 		carroBuilder = new MotoTestDataBuilder();
 		insertarNVehiculos(carroBuilder, 3);
 		
-		Assert.assertEquals(9, controladorEstacionamiento.listarVehiculosParqueados(null).getBody().size());
-		Assert.assertEquals(6, controladorEstacionamiento.listarVehiculosParqueados(TipoVehiculo.CARRO.toString()).getBody().size());
-		Assert.assertEquals(3, controladorEstacionamiento.listarVehiculosParqueados(TipoVehiculo.MOTO.toString()).getBody().size());
-		Assert.assertNull(controladorEstacionamiento.listarVehiculosParqueados("OTRO").getBody());
+		assertEquals(9, controladorEstacionamiento.listarVehiculosParqueados(null).getBody().size());
+		assertEquals(6, controladorEstacionamiento.listarVehiculosParqueados(TipoVehiculo.CARRO.toString()).getBody().size());
+		assertEquals(3, controladorEstacionamiento.listarVehiculosParqueados(TipoVehiculo.MOTO.toString()).getBody().size());
+		try {
+			controladorEstacionamiento.listarVehiculosParqueados("OTRO");
+			fail();
+		} catch (VigilanteServiceException e) {
+			assertEquals(VigilanteServiceException.TIPO_VEHICULO, e.getMessage());
+		}
 	}
 	
 }

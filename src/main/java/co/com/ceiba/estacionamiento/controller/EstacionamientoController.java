@@ -1,8 +1,7 @@
 package co.com.ceiba.estacionamiento.controller;
 
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -10,17 +9,17 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import co.com.ceiba.estacionamiento.EstacionamientoApplication;
 import co.com.ceiba.estacionamiento.business.TipoVehiculo;
 import co.com.ceiba.estacionamiento.business.Vehiculo;
-import co.com.ceiba.estacionamiento.business.VigilanteServiceException;
 import co.com.ceiba.estacionamiento.business.VigilanteService;
+import co.com.ceiba.estacionamiento.business.VigilanteServiceException;
 
 @RestController
 public class EstacionamientoController {
@@ -29,52 +28,34 @@ public class EstacionamientoController {
 	@Autowired
 	private VigilanteService servicioVigilante;
 	
-	@RequestMapping("/estacionamiento/listarVehiculosParqueados")
+	@CrossOrigin(origins = "http://localhost:4200")
+	@GetMapping("/estacionamiento/listarVehiculosParqueados")
 	public ResponseEntity<List<VehiculoRequestBody>> listarVehiculosParqueados(@RequestParam(required=false) String tipoVehiculo) {
-		TipoVehiculo tipo = null;
-		if (tipoVehiculo != null) {
-			try {
-				tipo = TipoVehiculo.valueOf(tipoVehiculo);
-			} catch (Exception e) {
-				LOGGER.error(e);
-				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-			}
-		}
 		List<VehiculoRequestBody> resultadoVehiculos = new ArrayList<>();
-		servicioVigilante.listarVehiculosParqueados(tipo).stream().forEach(v -> resultadoVehiculos.add(new VehiculoRequestBody(v.getPlaca(), v.getTipoVehiculo().toString(), v.getCilindraje(), v.getFechaIngreso(), null)));
+		servicioVigilante.listarVehiculosParqueados(tipoVehiculo).stream().forEach(v -> resultadoVehiculos.add(new VehiculoRequestBody(v.getPlaca(), v.getTipoVehiculo().toString(), v.getCilindraje(), v.getFechaIngreso(), null)));
 		return new ResponseEntity<>(resultadoVehiculos, HttpStatus.OK);
 	}
 	
-	@RequestMapping(method = RequestMethod.POST, value = "/estacionamiento/registrarIngresoVehiculo")
-	public ResponseEntity<String> registrarIngresoVehiculo(@ModelAttribute VehiculoRequestBody vehiculoBody) {
-		Date ingreso;
+	@CrossOrigin(origins = "http://localhost:4200")
+	@PostMapping(value = "/estacionamiento/registrarIngresoVehiculo")
+	public ResponseEntity<List<String>> registrarIngresoVehiculo(@RequestBody VehiculoRequestBody vehiculoBody) {
 		try {
-			ingreso = EstacionamientoApplication.formatoFecha().parse(vehiculoBody.getFechaIngreso());
-		} catch (ParseException e) {
-			ingreso = new Date();
-		}
-		try {
-			servicioVigilante.registrarIngresoVehiculo(new Vehiculo(vehiculoBody.getPlaca(), vehiculoBody.getCilindraje(), TipoVehiculo.valueOf(vehiculoBody.getTipoVehiculo()), ingreso));
-			return new ResponseEntity<>(HttpStatus.OK);
+			servicioVigilante.registrarIngresoVehiculo(new Vehiculo(vehiculoBody.getPlaca(), vehiculoBody.getCilindraje(), TipoVehiculo.valueOf(vehiculoBody.getTipoVehiculo()), vehiculoBody.getFechaIngreso()));
+			return new ResponseEntity<>(Arrays.asList("El vehiculo ha sido ingresado"), HttpStatus.OK);
 		} catch (VigilanteServiceException e) {
 			LOGGER.info(e);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+			return new ResponseEntity<>(Arrays.asList(e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 	
-	@RequestMapping(method = RequestMethod.POST, value = "/estacionamiento/registrarEgresoVehiculo")
-	public ResponseEntity<String> registrarEgresoVehiculo(@ModelAttribute VehiculoRequestBody vehiculoBody) {
-		Date egreso;
+	@CrossOrigin(origins = "http://localhost:4200")
+	@PostMapping(value = "/estacionamiento/registrarEgresoVehiculo")
+	public ResponseEntity<List<String>> registrarEgresoVehiculo(@RequestBody VehiculoRequestBody vehiculoBody) {
 		try {
-			egreso = EstacionamientoApplication.formatoFecha().parse(vehiculoBody.getFechaEgreso());
-		} catch (ParseException e) {
-			egreso = new Date();
-		}
-		try {
-			return new ResponseEntity<>(servicioVigilante.registrarEgresoVehiculo(vehiculoBody.getPlaca(), egreso).toString(), HttpStatus.OK);
+			return new ResponseEntity<>(Arrays.asList(servicioVigilante.registrarEgresoVehiculo(vehiculoBody.getPlaca(), vehiculoBody.getFechaEgreso()).toString()), HttpStatus.OK);
 		} catch (VigilanteServiceException e) {
 			LOGGER.info(e);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+			return new ResponseEntity<>(Arrays.asList(e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 }

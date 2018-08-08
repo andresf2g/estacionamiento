@@ -10,6 +10,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import co.com.ceiba.estacionamiento.EstacionamientoApplication;
 import co.com.ceiba.estacionamiento.model.PrecioEntity;
 import co.com.ceiba.estacionamiento.model.VehiculoBuilder;
 import co.com.ceiba.estacionamiento.model.VehiculoEntity;
@@ -39,14 +40,20 @@ public class VigilanteServiceImpl implements VigilanteService {
 		repositorioVehiculo.save(VehiculoBuilder.convertirAEntity(vehiculo));
 	}
 
-	public BigDecimal registrarEgresoVehiculo(String placa, Date fechaEgreso) {
+	public BigDecimal registrarEgresoVehiculo(String placa, String fechaEgreso) {
+		Date egreso;
+		try {
+			egreso = EstacionamientoApplication.formatoFecha().parse(fechaEgreso);
+		} catch (Exception e) {
+			egreso = new Date();
+		}
 		BigDecimal valorPagar = BigDecimal.ZERO;
 		Optional<VehiculoEntity> vehiculo = repositorioVehiculo.findById(placa); 
 		if (!vehiculo.isPresent()) {
 			throw new VigilanteServiceException(VigilanteServiceException.VEHICULO_NO_INGRESADO);
 		}
 		List<PrecioEntity> listaPrecios = repositorioPrecio.findByIdPrecioTipoVehiculo(vehiculo.get().getTipoVehiculo());
-		int[] tiempoParqueo = calcularTiempoDiferencia(vehiculo.get().getFechaIngreso(), fechaEgreso);
+		int[] tiempoParqueo = calcularTiempoDiferencia(vehiculo.get().getFechaIngreso(), egreso);
 		if (tiempoParqueo[0] > 0) {
 			/* Tiempo en dias */
 			valorPagar = valorPagar.add(obtenerPrecioParqueo(listaPrecios, TipoPrecio.DIA).multiply(new BigDecimal(tiempoParqueo[0])));
@@ -63,10 +70,18 @@ public class VigilanteServiceImpl implements VigilanteService {
 		return valorPagar;
 	}
 	
-	public List<Vehiculo> listarVehiculosParqueados(TipoVehiculo tipoVehiculo) {
-		List<Vehiculo> listadoVehiculos = new ArrayList<>();
+	public List<Vehiculo> listarVehiculosParqueados(String tipoVehiculo) {
+		TipoVehiculo tipo = null;
 		if (tipoVehiculo != null) {
-			List<VehiculoEntity> listadoEntidades = repositorioVehiculo.findByTipoVehiculo(tipoVehiculo);
+			try {
+				tipo = TipoVehiculo.valueOf(tipoVehiculo);
+			} catch (Exception e) {
+				throw new VigilanteServiceException(VigilanteServiceException.TIPO_VEHICULO);
+			}
+		}
+		List<Vehiculo> listadoVehiculos = new ArrayList<>();
+		if (tipo != null) {
+			List<VehiculoEntity> listadoEntidades = repositorioVehiculo.findByTipoVehiculo(tipo);
 			listadoEntidades.forEach(le -> listadoVehiculos.add(VehiculoBuilder.convertirADominio(le)));
 		} else {
 			Iterable<VehiculoEntity> listadoEntidades = repositorioVehiculo.findAll();

@@ -28,40 +28,20 @@ public class VehiculoRequestBody {
 		return placa;
 	}
 
-	public void setPlaca(String placa) {
-		this.placa = placa;
-	}
-
 	public String getTipoVehiculo() {
 		return tipoVehiculo;
-	}
-
-	public void setTipoVehiculo(String tipoVehiculo) {
-		this.tipoVehiculo = tipoVehiculo;
 	}
 
 	public Integer getCilindraje() {
 		return cilindraje;
 	}
 
-	public void setCilindraje(Integer cilindraje) {
-		this.cilindraje = cilindraje;
-	}
-
 	public String getFechaIngreso() {
 		return fechaIngreso;
 	}
 
-	public void setFechaIngreso(String fechaIngreso) {
-		this.fechaIngreso = fechaIngreso;
-	}
-
 	public String getFechaEgreso() {
 		return fechaEgreso;
-	}
-
-	public void setFechaEgreso(String fechaEgreso) {
-		this.fechaEgreso = fechaEgreso;
 	}
 
 }
