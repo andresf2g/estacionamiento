@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import co.com.ceiba.estacionamiento.business.TipoVehiculo;
-import co.com.ceiba.estacionamiento.business.Vehiculo;
 import co.com.ceiba.estacionamiento.business.VigilanteService;
 import co.com.ceiba.estacionamiento.business.VigilanteServiceException;
 
@@ -32,7 +30,7 @@ public class EstacionamientoController {
 	@GetMapping("/estacionamiento/listarVehiculosParqueados")
 	public ResponseEntity<List<VehiculoRequestBody>> listarVehiculosParqueados(@RequestParam(required=false) String tipoVehiculo) {
 		List<VehiculoRequestBody> resultadoVehiculos = new ArrayList<>();
-		servicioVigilante.listarVehiculosParqueados(tipoVehiculo).stream().forEach(v -> resultadoVehiculos.add(new VehiculoRequestBody(v.getPlaca(), v.getTipoVehiculo().toString(), v.getCilindraje(), v.getFechaIngreso(), null)));
+		servicioVigilante.listarVehiculosParqueados(tipoVehiculo).stream().forEach(vehiculo -> resultadoVehiculos.add(new VehiculoRequestBody(vehiculo)));
 		return new ResponseEntity<>(resultadoVehiculos, HttpStatus.OK);
 	}
 	
@@ -40,7 +38,7 @@ public class EstacionamientoController {
 	@PostMapping(value = "/estacionamiento/registrarIngresoVehiculo")
 	public ResponseEntity<List<String>> registrarIngresoVehiculo(@RequestBody VehiculoRequestBody vehiculoBody) {
 		try {
-			servicioVigilante.registrarIngresoVehiculo(new Vehiculo(vehiculoBody.getPlaca(), vehiculoBody.getCilindraje(), TipoVehiculo.valueOf(vehiculoBody.getTipoVehiculo()), vehiculoBody.getFechaIngreso()));
+			servicioVigilante.registrarIngresoVehiculo(vehiculoBody.obtenerVehiculo());
 			return new ResponseEntity<>(Arrays.asList("El vehiculo ha sido ingresado"), HttpStatus.OK);
 		} catch (VigilanteServiceException e) {
 			LOGGER.info(e);

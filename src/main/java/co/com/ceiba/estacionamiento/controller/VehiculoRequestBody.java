@@ -3,6 +3,8 @@ package co.com.ceiba.estacionamiento.controller;
 import java.util.Date;
 
 import co.com.ceiba.estacionamiento.EstacionamientoApplication;
+import co.com.ceiba.estacionamiento.business.TipoVehiculo;
+import co.com.ceiba.estacionamiento.business.Vehiculo;
 
 public class VehiculoRequestBody {
 	private String placa;
@@ -22,6 +24,17 @@ public class VehiculoRequestBody {
 		if (fechaEgreso != null) {
 			this.fechaEgreso = EstacionamientoApplication.formatoFecha().format(fechaEgreso);
 		}
+	}
+	
+	public VehiculoRequestBody(Vehiculo vehiculo) {
+		this.placa = vehiculo.getPlaca();
+		this.tipoVehiculo = vehiculo.getTipoVehiculo().toString();
+		this.cilindraje = vehiculo.getCilindraje();
+		this.fechaIngreso = EstacionamientoApplication.formatoFecha().format(vehiculo.getFechaIngreso());
+	}
+	
+	public Vehiculo obtenerVehiculo() {
+		return new Vehiculo(getPlaca(), getCilindraje(), TipoVehiculo.valueOf(getTipoVehiculo()), getFechaIngreso());
 	}
 
 	public String getPlaca() {
