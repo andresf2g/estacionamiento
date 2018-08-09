@@ -40,24 +40,22 @@ public class VigilanteTests {
 		}
 	}
 
+	private void registrarIngresoVehiculoParqueaderoDisponible(VehiculoTestDataBuilder vehiculoBuilder) {
+		servicioVigilante.evacuarVehiculosParqueados();
+		
+		controladorEstacionamiento.registrarIngresoVehiculo(vehiculoBuilder.buildBody());
+		
+		assertNotNull(servicioVigilante.buscarVehiculoParqueado(vehiculoBuilder.build().getPlaca()));
+	}
+	
 	@Test
 	public void registrarIngresoMotoConParqueaderoDisponibleTest() {
-		servicioVigilante.evacuarVehiculosParqueados();
-		VehiculoTestDataBuilder moto = new MotoTestDataBuilder();
-		
-		controladorEstacionamiento.registrarIngresoVehiculo(moto.buildBody());
-		
-		assertNotNull(servicioVigilante.buscarVehiculoParqueado(moto.build().getPlaca()));
+		registrarIngresoVehiculoParqueaderoDisponible(new MotoTestDataBuilder().conFechaIngreso(null));
 	}
 	
 	@Test
 	public void registrarIngresoCarroConParqueaderoDisponibleTest() {
-		servicioVigilante.evacuarVehiculosParqueados();
-		VehiculoTestDataBuilder carro = new CarroTestDataBuilder();
-		
-		controladorEstacionamiento.registrarIngresoVehiculo(carro.buildBody());
-		
-		assertNotNull(servicioVigilante.buscarVehiculoParqueado(carro.build().getPlaca()));
+		registrarIngresoVehiculoParqueaderoDisponible(new CarroTestDataBuilder().conFechaIngreso(null));
 	}
 	
 	@Test
@@ -86,12 +84,8 @@ public class VigilanteTests {
 
 	@Test
 	public void registrarIngresoVehiculoPlacaADiaCorrectoTest() {
-		servicioVigilante.evacuarVehiculosParqueados();
-		VehiculoTestDataBuilder carro = new CarroTestDataBuilder().conPlaca("ABC854").conFechaIngreso("2018-07-01 09:30");
-		
-		controladorEstacionamiento.registrarIngresoVehiculo(carro.buildBody());
-		
-		assertNotNull(servicioVigilante.buscarVehiculoParqueado(carro.build().getPlaca()));
+		registrarIngresoVehiculoParqueaderoDisponible(new CarroTestDataBuilder().conPlaca("ABC854").conFechaIngreso("2018-07-01 09:30"));
+		registrarIngresoVehiculoParqueaderoDisponible(new CarroTestDataBuilder().conPlaca("ABC854").conFechaIngreso("2018-07-02 09:30"));
 	}
 
 	@Test
@@ -167,6 +161,11 @@ public class VigilanteTests {
 	@Test
 	public void registrarEgresoCarroCobrandoDiasHorasTest() {
 		registrarEgresoVehiculoGenerico(new CarroTestDataBuilder(), "2018-07-11 12:50", "11000.00");
+	}
+	
+	@Test
+	public void registrarEgresoCarroCobrandoDiasConDiaAdicionalTest() {
+		registrarEgresoVehiculoGenerico(new CarroTestDataBuilder(), "2018-07-11 19:49", "16000.00");
 	}
 
 	@Test

@@ -1,6 +1,5 @@
 package co.com.ceiba.estacionamiento.builders;
 
-import java.text.ParseException;
 import java.util.Date;
 
 import co.com.ceiba.estacionamiento.EstacionamientoApplication;
@@ -21,7 +20,7 @@ public abstract class VehiculoTestDataBuilder {
 	public VehiculoTestDataBuilder() {
 		try {
 			this.fechaIngreso = EstacionamientoApplication.formatoFecha().parse(FECHA_INGRESO);
-		} catch (ParseException e) {
+		} catch (Exception e) {
 			this.fechaIngreso = new Date();
 		}
 	}
@@ -36,15 +35,10 @@ public abstract class VehiculoTestDataBuilder {
 		return this;
 	}
 	
-	public VehiculoTestDataBuilder conTipoVehiculo(TipoVehiculo tipoVehiculo) {
-		this.tipoVehiculo = tipoVehiculo;
-		return this;
-	}
-	
 	public VehiculoTestDataBuilder conFechaIngreso(String fechaIngreso) {
 		try {
 			this.fechaIngreso = EstacionamientoApplication.formatoFecha().parse(fechaIngreso);
-		} catch (ParseException e) {
+		} catch (Exception e) {
 			this.fechaIngreso = new Date();
 		}
 		return this;
@@ -53,7 +47,7 @@ public abstract class VehiculoTestDataBuilder {
 	public VehiculoTestDataBuilder conFechaEgreso(String fechaEgreso) {
 		try {
 			this.fechaEgreso = EstacionamientoApplication.formatoFecha().parse(fechaEgreso);
-		} catch (ParseException e) {
+		} catch (Exception e) {
 			this.fechaEgreso = new Date();
 		}
 		return this;
