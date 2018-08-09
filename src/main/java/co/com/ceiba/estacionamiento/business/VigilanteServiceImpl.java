@@ -2,7 +2,7 @@ package co.com.ceiba.estacionamiento.business;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -10,6 +10,9 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import co.com.ceiba.estacionamiento.business.validation.DiaCorrectoParaVehiculoPlacaA;
+import co.com.ceiba.estacionamiento.business.validation.DisponibilidadEstacionamiento;
+import co.com.ceiba.estacionamiento.business.validation.VehiculoEstacionado;
 import co.com.ceiba.estacionamiento.model.IdPrecio;
 import co.com.ceiba.estacionamiento.model.PrecioEntity;
 import co.com.ceiba.estacionamiento.model.VehiculoBuilder;
@@ -24,35 +27,10 @@ public class VigilanteServiceImpl implements VigilanteService {
 	@Autowired
 	private PrecioRepository repositorioPrecio;
 	
-	private boolean esDiaCorrectoParaVehiculoPlacaA(Vehiculo vehiculo) {
-		if (vehiculo.getPlaca().toUpperCase().startsWith("A")) {
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTime(vehiculo.getFechaIngreso());
-			return calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY || calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY;
-		}
-		return true;
-	}
-	
-	private boolean hayDisponibilidadEstacionamiento(Vehiculo vehiculo) {
-		int vehiculosParqueados = repositorioVehiculo.countByTipoVehiculo(vehiculo.getTipoVehiculo());
-		return (vehiculo.getTipoVehiculo().equals(TipoVehiculo.MOTO) && vehiculosParqueados < 10)
-				|| (vehiculo.getTipoVehiculo().equals(TipoVehiculo.CARRO) && vehiculosParqueados < 20);
-	}
-	
-	private boolean estaVehiculoEstacionado(Vehiculo vehiculo) {
-		return repositorioVehiculo.findById(vehiculo.getPlaca()).isPresent();
-	}
-	
 	public void registrarIngresoVehiculo(Vehiculo vehiculo) {
-		if (!esDiaCorrectoParaVehiculoPlacaA(vehiculo)) {
-			throw new VigilanteServiceException(VigilanteServiceException.PLACA_A_DIA_INCORRECTO);
-		}
-		if (!hayDisponibilidadEstacionamiento(vehiculo)) {
-			throw new VigilanteServiceException(VigilanteServiceException.INDISPONIBILIDAD_PARQUEADERO);
-		}
-		if (estaVehiculoEstacionado(vehiculo)) {
-			throw new VigilanteServiceException(VigilanteServiceException.VEHICULO_YA_INGRESADO);
-		}
+		Arrays.asList(new DiaCorrectoParaVehiculoPlacaA(), new DisponibilidadEstacionamiento(repositorioVehiculo),
+				new VehiculoEstacionado(repositorioVehiculo)).stream()
+				.forEach(validacion -> validacion.validarVehiculoCorrecto(vehiculo));
 		repositorioVehiculo.save(VehiculoBuilder.convertirAEntity(vehiculo));
 	}
 	
@@ -116,12 +94,11 @@ public class VigilanteServiceImpl implements VigilanteService {
 	}
 
 	public Vehiculo buscarVehiculoParqueado(String placa) {
-		Vehiculo vehiculo = null;
 		Optional<VehiculoEntity> vehiculoEntity = repositorioVehiculo.findById(placa);
 		if (vehiculoEntity.isPresent()) {
-			vehiculo = VehiculoBuilder.convertirADominio(vehiculoEntity.get());
+			return VehiculoBuilder.convertirADominio(vehiculoEntity.get());
 		}
-		return vehiculo;
+		return null;
 	}
 
 }
