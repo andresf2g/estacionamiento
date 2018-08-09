@@ -16,10 +16,6 @@ public class PrecioEntity {
 	@Column(name = "valor")
 	private BigDecimal valor;
 
-	public IdPrecio getIdPrecio() {
-		return idPrecio;
-	}
-
 	public BigDecimal getValor() {
 		return valor;
 	}

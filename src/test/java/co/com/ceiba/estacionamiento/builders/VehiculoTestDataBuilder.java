@@ -2,8 +2,8 @@ package co.com.ceiba.estacionamiento.builders;
 
 import java.util.Date;
 
-import co.com.ceiba.estacionamiento.EstacionamientoApplication;
 import co.com.ceiba.estacionamiento.business.TipoVehiculo;
+import co.com.ceiba.estacionamiento.business.DateUtils;
 import co.com.ceiba.estacionamiento.business.Vehiculo;
 import co.com.ceiba.estacionamiento.controller.VehiculoRequestBody;
 
@@ -18,11 +18,7 @@ public abstract class VehiculoTestDataBuilder {
 	protected String prefijoPlaca;
 	
 	public VehiculoTestDataBuilder() {
-		try {
-			this.fechaIngreso = EstacionamientoApplication.formatoFecha().parse(FECHA_INGRESO);
-		} catch (Exception e) {
-			this.fechaIngreso = new Date();
-		}
+		this.fechaIngreso = DateUtils.convertirTextoAFecha(FECHA_INGRESO);
 	}
 	
 	public VehiculoTestDataBuilder conPlaca(String placa) {
@@ -36,20 +32,12 @@ public abstract class VehiculoTestDataBuilder {
 	}
 	
 	public VehiculoTestDataBuilder conFechaIngreso(String fechaIngreso) {
-		try {
-			this.fechaIngreso = EstacionamientoApplication.formatoFecha().parse(fechaIngreso);
-		} catch (Exception e) {
-			this.fechaIngreso = new Date();
-		}
+		this.fechaIngreso = DateUtils.convertirTextoAFecha(fechaIngreso);
 		return this;
 	}
 	
 	public VehiculoTestDataBuilder conFechaEgreso(String fechaEgreso) {
-		try {
-			this.fechaEgreso = EstacionamientoApplication.formatoFecha().parse(fechaEgreso);
-		} catch (Exception e) {
-			this.fechaEgreso = new Date();
-		}
+		this.fechaEgreso = DateUtils.convertirTextoAFecha(fechaEgreso);
 		return this;
 	}
 	

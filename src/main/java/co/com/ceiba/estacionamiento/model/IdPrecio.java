@@ -22,8 +22,13 @@ public class IdPrecio implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private TipoPrecio tipoPrecio;
 
-	public TipoPrecio getTipoPrecio() {
-		return tipoPrecio;
+	public IdPrecio() {
+	}
+
+	public IdPrecio(TipoVehiculo tipoVehiculo, TipoPrecio tipoPrecio) {
+		super();
+		this.tipoVehiculo = tipoVehiculo;
+		this.tipoPrecio = tipoPrecio;
 	}
 
 }

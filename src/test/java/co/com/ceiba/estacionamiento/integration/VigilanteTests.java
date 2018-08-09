@@ -3,7 +3,6 @@ package co.com.ceiba.estacionamiento.integration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
 import java.text.ParseException;
 import java.util.List;
@@ -209,12 +208,6 @@ public class VigilanteTests {
 		assertEquals(9, controladorEstacionamiento.listarVehiculosParqueados(null).getBody().size());
 		assertEquals(6, controladorEstacionamiento.listarVehiculosParqueados(TipoVehiculo.CARRO.toString()).getBody().size());
 		assertEquals(3, controladorEstacionamiento.listarVehiculosParqueados(TipoVehiculo.MOTO.toString()).getBody().size());
-		try {
-			controladorEstacionamiento.listarVehiculosParqueados("OTRO");
-			fail();
-		} catch (VigilanteServiceException e) {
-			assertEquals(VigilanteServiceException.TIPO_VEHICULO, e.getMessage());
-		}
 	}
 	
 }
