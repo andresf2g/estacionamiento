@@ -3,7 +3,11 @@ package co.com.ceiba.estacionamiento.business;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class DateUtils {
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+public final class DateUtils {
+	private static final Log LOGGER = LogFactory.getLog(DateUtils.class);
 	
 	private DateUtils() {
 	}
@@ -16,6 +20,7 @@ public class DateUtils {
 		try {
 			return DateUtils.formatoFecha().parse(fecha);
 		} catch (Exception e) {
+			LOGGER.info(e);
 			return new Date();
 		}
 	}
