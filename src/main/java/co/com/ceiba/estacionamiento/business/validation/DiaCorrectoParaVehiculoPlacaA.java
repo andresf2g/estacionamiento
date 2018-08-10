@@ -8,7 +8,7 @@ import co.com.ceiba.estacionamiento.business.VigilanteServiceException;
 public class DiaCorrectoParaVehiculoPlacaA implements ValidacionVehiculo {
 
 	@Override
-	public void validarVehiculoCorrecto(Vehiculo vehiculo) {
+	public void validar(Vehiculo vehiculo) {
 		if (vehiculo.getPlaca().toUpperCase().startsWith("A")) {
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(vehiculo.getFechaIngreso());

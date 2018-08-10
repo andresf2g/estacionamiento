@@ -14,7 +14,7 @@ public class DisponibilidadEstacionamiento implements ValidacionVehiculo {
 	}
 	
 	@Override
-	public void validarVehiculoCorrecto(Vehiculo vehiculo) {
+	public void validar(Vehiculo vehiculo) {
 		int vehiculosParqueados = repositorioVehiculo.countByTipoVehiculo(vehiculo.getTipoVehiculo());
 		if ((vehiculo.getTipoVehiculo().equals(TipoVehiculo.MOTO) && vehiculosParqueados >= 10)
 				|| (vehiculo.getTipoVehiculo().equals(TipoVehiculo.CARRO) && vehiculosParqueados >= 20)) {

@@ -13,7 +13,7 @@ public class VehiculoEstacionado implements ValidacionVehiculo {
 	}
 	
 	@Override
-	public void validarVehiculoCorrecto(Vehiculo vehiculo) {
+	public void validar(Vehiculo vehiculo) {
 		if (repositorioVehiculo.findById(vehiculo.getPlaca()).isPresent()) {
 			throw new VigilanteServiceException(VigilanteServiceException.VEHICULO_YA_INGRESADO);
 		}

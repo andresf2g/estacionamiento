@@ -28,5 +28,19 @@ public final class DateUtils {
 	public static String convertirFechaATexto(Date fecha) {
 		return DateUtils.formatoFecha().format(fecha);
 	}
+	
+	public static TiempoEstadia obtenerTiempoEstadia(Date fechaIngreso, Date fechaEgreso) {
+		long timeDifference = fechaEgreso.getTime() - fechaIngreso.getTime();
+		int hours = (int) Math.ceil(((double) timeDifference) / 1000 / 60 / 60);
+		if (hours > 8) {
+			if (hours / 24 == 0) {
+				return new TiempoEstadia(1, 0);
+			} else if (hours - ((hours / 24) * 24) > 8) {
+				return new TiempoEstadia((hours / 24) + 1, 0);
+			}
+			return new TiempoEstadia(hours / 24, hours - ((hours / 24) * 24));
+		}
+		return new TiempoEstadia(0, hours);
+	}
 
 }
