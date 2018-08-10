@@ -11,18 +11,18 @@ public class VehiculoRequestBody {
 	private String tipoVehiculo;
 	private Integer cilindraje;
 	private String fechaIngreso;
-	private String fechaEgreso;
+	private String fechaSalida;
 
 	public VehiculoRequestBody() {
 	}
 	
-	public VehiculoRequestBody(String placa, String tipoVehiculo, Integer cilindraje, Date fechaIngreso, Date fechaEgreso) {
+	public VehiculoRequestBody(String placa, String tipoVehiculo, Integer cilindraje, Date fechaIngreso, Date fechaSalida) {
 		this.placa = placa;
 		this.tipoVehiculo = tipoVehiculo;
 		this.cilindraje = cilindraje;
 		this.fechaIngreso = DateUtils.convertirFechaATexto(fechaIngreso);
-		if (fechaEgreso != null) {
-			this.fechaEgreso = DateUtils.convertirFechaATexto(fechaEgreso);
+		if (fechaSalida != null) {
+			this.fechaSalida = DateUtils.convertirFechaATexto(fechaSalida);
 		}
 	}
 	
@@ -53,8 +53,8 @@ public class VehiculoRequestBody {
 		return fechaIngreso;
 	}
 
-	public String getFechaEgreso() {
-		return fechaEgreso;
+	public String getFechaSalida() {
+		return fechaSalida;
 	}
 
 }

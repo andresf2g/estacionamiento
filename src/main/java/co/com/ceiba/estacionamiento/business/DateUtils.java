@@ -29,8 +29,8 @@ public final class DateUtils {
 		return DateUtils.formatoFecha().format(fecha);
 	}
 	
-	public static TiempoEstadia obtenerTiempoEstadia(Date fechaIngreso, Date fechaEgreso) {
-		long timeDifference = fechaEgreso.getTime() - fechaIngreso.getTime();
+	public static TiempoEstadia obtenerTiempoEstadia(Date fechaIngreso, Date fechaSalida) {
+		long timeDifference = fechaSalida.getTime() - fechaIngreso.getTime();
 		int hours = (int) Math.ceil(((double) timeDifference) / 1000 / 60 / 60);
 		if (hours > 8) {
 			if (hours / 24 == 0) {

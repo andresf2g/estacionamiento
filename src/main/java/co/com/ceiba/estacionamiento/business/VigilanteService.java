@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface VigilanteService {
 	public void registrarIngresoVehiculo(Vehiculo vehiculo);
-	public BigDecimal registrarEgresoVehiculo(String placa, String fechaEgreso);
+	public BigDecimal registrarSalidaVehiculo(String placa, String fechaSalida);
 	public List<Vehiculo> listarVehiculosParqueados(String tipoVehiculo);
 	public void evacuarVehiculosParqueados();
 	public Vehiculo buscarVehiculoParqueado(String placa);

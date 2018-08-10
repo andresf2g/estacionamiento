@@ -14,7 +14,7 @@ public abstract class VehiculoTestDataBuilder {
 	protected Integer cilindraje;
 	protected TipoVehiculo tipoVehiculo;
 	protected Date fechaIngreso;
-	protected Date fechaEgreso;
+	protected Date fechaSalida;
 	protected String prefijoPlaca;
 	
 	public VehiculoTestDataBuilder() {
@@ -36,8 +36,8 @@ public abstract class VehiculoTestDataBuilder {
 		return this;
 	}
 	
-	public VehiculoTestDataBuilder conFechaEgreso(String fechaEgreso) {
-		this.fechaEgreso = DateUtils.convertirTextoAFecha(fechaEgreso);
+	public VehiculoTestDataBuilder conFechaSalida(String fechaSalida) {
+		this.fechaSalida = DateUtils.convertirTextoAFecha(fechaSalida);
 		return this;
 	}
 	
@@ -50,6 +50,6 @@ public abstract class VehiculoTestDataBuilder {
 	}
 	
 	public VehiculoRequestBody buildBody() {
-		return new VehiculoRequestBody(this.placa, this.tipoVehiculo.toString(), this.cilindraje, this.fechaIngreso, this.fechaEgreso);
+		return new VehiculoRequestBody(this.placa, this.tipoVehiculo.toString(), this.cilindraje, this.fechaIngreso, this.fechaSalida);
 	}
 }

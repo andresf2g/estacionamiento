@@ -2,9 +2,9 @@ package co.com.ceiba.estacionamiento.business.validation;
 
 import java.util.Arrays;
 
-public class ValidadorEgresoVehiculo extends ValidadorVehiculo {
+public class ValidadorSalidaVehiculo extends ValidadorVehiculo {
 	
-	public ValidadorEgresoVehiculo() {
+	public ValidadorSalidaVehiculo() {
 		super.listaValidaciones = Arrays.asList(new VehiculoNoEstacionado());
 	}
 

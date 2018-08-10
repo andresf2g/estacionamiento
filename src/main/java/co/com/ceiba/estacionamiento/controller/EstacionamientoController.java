@@ -47,10 +47,10 @@ public class EstacionamientoController {
 	}
 	
 	@CrossOrigin(origins = "http://localhost:4200")
-	@PostMapping(value = "/estacionamiento/registrarEgresoVehiculo")
-	public ResponseEntity<List<String>> registrarEgresoVehiculo(@RequestBody VehiculoRequestBody vehiculoBody) {
+	@PostMapping(value = "/estacionamiento/registrarSalidaVehiculo")
+	public ResponseEntity<List<String>> registrarSalidaVehiculo(@RequestBody VehiculoRequestBody vehiculoBody) {
 		try {
-			return new ResponseEntity<>(Arrays.asList(servicioVigilante.registrarEgresoVehiculo(vehiculoBody.getPlaca(), vehiculoBody.getFechaEgreso()).toString()), HttpStatus.OK);
+			return new ResponseEntity<>(Arrays.asList(servicioVigilante.registrarSalidaVehiculo(vehiculoBody.getPlaca(), vehiculoBody.getFechaSalida()).toString()), HttpStatus.OK);
 		} catch (VigilanteServiceException e) {
 			LOGGER.info(e);
 			return new ResponseEntity<>(Arrays.asList(e.getMessage()), HttpStatus.BAD_REQUEST);

@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import co.com.ceiba.estacionamiento.business.price.PrecioEstacionamiento;
-import co.com.ceiba.estacionamiento.business.validation.ValidadorEgresoVehiculo;
+import co.com.ceiba.estacionamiento.business.validation.ValidadorSalidaVehiculo;
 import co.com.ceiba.estacionamiento.business.validation.ValidadorIngresoVehiculo;
 import co.com.ceiba.estacionamiento.model.VehiculoBuilder;
 import co.com.ceiba.estacionamiento.model.VehiculoEntity;
@@ -28,10 +28,10 @@ public class VigilanteServiceImpl implements VigilanteService {
 		repositorioVehiculo.save(VehiculoBuilder.convertirAEntity(vehiculo));
 	}
 
-	public BigDecimal registrarEgresoVehiculo(String placa, String fechaEgreso) {
+	public BigDecimal registrarSalidaVehiculo(String placa, String fechaSalida) {
 		Vehiculo vehiculo = buscarVehiculoParqueado(placa);
-		new ValidadorEgresoVehiculo().obtenerValidaciones().forEach(validador -> validador.validar(vehiculo));
-		TiempoEstadia tiempoEstadia = DateUtils.obtenerTiempoEstadia(vehiculo.getFechaIngreso(), DateUtils.convertirTextoAFecha(fechaEgreso));
+		new ValidadorSalidaVehiculo().obtenerValidaciones().forEach(validador -> validador.validar(vehiculo));
+		TiempoEstadia tiempoEstadia = DateUtils.obtenerTiempoEstadia(vehiculo.getFechaIngreso(), DateUtils.convertirTextoAFecha(fechaSalida));
 		BigDecimal valorPagar = new PrecioEstacionamiento(repositorioPrecio, tiempoEstadia).calcularTotal(vehiculo);
 		repositorioVehiculo.deleteById(placa);
 		return valorPagar;
