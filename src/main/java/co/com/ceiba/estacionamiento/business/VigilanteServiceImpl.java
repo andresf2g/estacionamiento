@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import co.com.ceiba.estacionamiento.business.price.PrecioEstacionamiento;
-import co.com.ceiba.estacionamiento.business.validation.ValidadorSalidaVehiculo;
 import co.com.ceiba.estacionamiento.business.validation.ValidadorIngresoVehiculo;
+import co.com.ceiba.estacionamiento.business.validation.ValidadorSalidaVehiculo;
 import co.com.ceiba.estacionamiento.model.VehiculoBuilder;
 import co.com.ceiba.estacionamiento.model.VehiculoEntity;
 import co.com.ceiba.estacionamiento.repository.PrecioRepository;
@@ -37,11 +37,11 @@ public class VigilanteServiceImpl implements VigilanteService {
 		return valorPagar;
 	}
 
-	public List<Vehiculo> listarVehiculosParqueados(String tipoVehiculo) {
+	public List<Vehiculo> listarVehiculosParqueados(String placa) {
 		List<Vehiculo> listadoVehiculos = new ArrayList<>();
 		Iterable<VehiculoEntity> listadoEntidades;
-		if (tipoVehiculo != null) {
-			listadoEntidades = repositorioVehiculo.findByTipoVehiculo(TipoVehiculo.valueOf(tipoVehiculo));
+		if (placa != null) {
+			listadoEntidades = repositorioVehiculo.findByPlaca(placa);
 		} else {
 			listadoEntidades = repositorioVehiculo.findAll();
 		}

@@ -28,9 +28,9 @@ public class EstacionamientoController {
 	
 	@CrossOrigin(origins = "http://localhost:4200")
 	@GetMapping("/estacionamiento/listarVehiculosParqueados")
-	public ResponseEntity<List<VehiculoRequestBody>> listarVehiculosParqueados(@RequestParam(required=false) String tipoVehiculo) {
+	public ResponseEntity<List<VehiculoRequestBody>> listarVehiculosParqueados(@RequestParam(required=false) String placa) {
 		List<VehiculoRequestBody> resultadoVehiculos = new ArrayList<>();
-		servicioVigilante.listarVehiculosParqueados(tipoVehiculo).stream().forEach(vehiculo -> resultadoVehiculos.add(new VehiculoRequestBody(vehiculo)));
+		servicioVigilante.listarVehiculosParqueados(placa).stream().forEach(vehiculo -> resultadoVehiculos.add(new VehiculoRequestBody(vehiculo)));
 		return new ResponseEntity<>(resultadoVehiculos, HttpStatus.OK);
 	}
 	

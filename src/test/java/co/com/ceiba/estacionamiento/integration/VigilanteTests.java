@@ -19,7 +19,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import co.com.ceiba.estacionamiento.builders.CarroTestDataBuilder;
 import co.com.ceiba.estacionamiento.builders.MotoTestDataBuilder;
 import co.com.ceiba.estacionamiento.builders.VehiculoTestDataBuilder;
-import co.com.ceiba.estacionamiento.business.TipoVehiculo;
 import co.com.ceiba.estacionamiento.business.VigilanteService;
 import co.com.ceiba.estacionamiento.business.VigilanteServiceException;
 import co.com.ceiba.estacionamiento.controller.EstacionamientoController;
@@ -220,14 +219,13 @@ public class VigilanteTests {
 	@Test
 	public void listarVehiculosParqueadosTest() {
 		servicioVigilante.evacuarVehiculosParqueados();
-		VehiculoTestDataBuilder carroBuilder = new CarroTestDataBuilder();
-		insertarNVehiculos(carroBuilder, 6);
-		carroBuilder = new MotoTestDataBuilder();
-		insertarNVehiculos(carroBuilder, 3);
+		VehiculoTestDataBuilder vehiculoBuilder = new CarroTestDataBuilder();
+		insertarNVehiculos(vehiculoBuilder, 6);
+		vehiculoBuilder = new MotoTestDataBuilder();
+		servicioVigilante.registrarIngresoVehiculo(vehiculoBuilder.build());
 		
-		assertEquals(9, controladorEstacionamiento.listarVehiculosParqueados(null).getBody().size());
-		assertEquals(6, controladorEstacionamiento.listarVehiculosParqueados(TipoVehiculo.CARRO.toString()).getBody().size());
-		assertEquals(3, controladorEstacionamiento.listarVehiculosParqueados(TipoVehiculo.MOTO.toString()).getBody().size());
+		assertEquals(7, controladorEstacionamiento.listarVehiculosParqueados(null).getBody().size());
+		assertEquals(1, controladorEstacionamiento.listarVehiculosParqueados("BCD98E").getBody().size());
 	}
 	
 }

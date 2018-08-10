@@ -6,6 +6,6 @@ import co.com.ceiba.estacionamiento.business.TipoVehiculo;
 import co.com.ceiba.estacionamiento.model.VehiculoEntity;
 
 public interface VehiculoRepository extends CrudRepository<VehiculoEntity, String> {
-	public Iterable<VehiculoEntity> findByTipoVehiculo(TipoVehiculo tipoVehiculo);
+	public Iterable<VehiculoEntity> findByPlaca(String placa);
 	public int countByTipoVehiculo(TipoVehiculo tipoVehiculo);
 }
