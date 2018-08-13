@@ -3,15 +3,14 @@ package co.com.ceiba.estacionamiento.controller;
 import java.util.Date;
 
 import co.com.ceiba.estacionamiento.business.TipoVehiculo;
-import co.com.ceiba.estacionamiento.business.DateUtils;
 import co.com.ceiba.estacionamiento.business.Vehiculo;
 
 public class VehiculoRequestBody {
 	private String placa;
 	private String tipoVehiculo;
 	private Integer cilindraje;
-	private String fechaIngreso;
-	private String fechaSalida;
+	private Date fechaIngreso;
+	private Date fechaSalida;
 
 	public VehiculoRequestBody() {
 	}
@@ -20,9 +19,9 @@ public class VehiculoRequestBody {
 		this.placa = placa;
 		this.tipoVehiculo = tipoVehiculo;
 		this.cilindraje = cilindraje;
-		this.fechaIngreso = DateUtils.convertirFechaATexto(fechaIngreso);
+		this.fechaIngreso = fechaIngreso;
 		if (fechaSalida != null) {
-			this.fechaSalida = DateUtils.convertirFechaATexto(fechaSalida);
+			this.fechaSalida = fechaSalida;
 		}
 	}
 	
@@ -30,7 +29,7 @@ public class VehiculoRequestBody {
 		this.placa = vehiculo.getPlaca();
 		this.tipoVehiculo = vehiculo.getTipoVehiculo().toString();
 		this.cilindraje = vehiculo.getCilindraje();
-		this.fechaIngreso = DateUtils.convertirFechaATexto(vehiculo.getFechaIngreso());
+		this.fechaIngreso = vehiculo.getFechaIngreso();
 	}
 	
 	public Vehiculo obtenerVehiculo() {
@@ -49,11 +48,11 @@ public class VehiculoRequestBody {
 		return cilindraje;
 	}
 
-	public String getFechaIngreso() {
+	public Date getFechaIngreso() {
 		return fechaIngreso;
 	}
 
-	public String getFechaSalida() {
+	public Date getFechaSalida() {
 		return fechaSalida;
 	}
 

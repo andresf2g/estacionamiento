@@ -2,6 +2,7 @@ package co.com.ceiba.estacionamiento.business;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,10 +29,10 @@ public class VigilanteServiceImpl implements VigilanteService {
 		repositorioVehiculo.save(VehiculoBuilder.convertirAEntity(vehiculo));
 	}
 
-	public BigDecimal registrarSalidaVehiculo(String placa, String fechaSalida) {
+	public BigDecimal registrarSalidaVehiculo(String placa, Date fechaSalida) {
 		Vehiculo vehiculo = buscarVehiculoParqueado(placa);
 		new ValidadorSalidaVehiculo().obtenerValidaciones().forEach(validador -> validador.validar(vehiculo));
-		TiempoEstadia tiempoEstadia = DateUtils.obtenerTiempoEstadia(vehiculo.getFechaIngreso(), DateUtils.convertirTextoAFecha(fechaSalida));
+		TiempoEstadia tiempoEstadia = DateUtils.obtenerTiempoEstadia(vehiculo.getFechaIngreso(), fechaSalida);
 		BigDecimal valorPagar = new PrecioEstacionamiento(repositorioPrecio, tiempoEstadia).calcularTotal(vehiculo);
 		repositorioVehiculo.deleteById(placa);
 		return valorPagar;
