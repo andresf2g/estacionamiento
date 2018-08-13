@@ -1,6 +1,5 @@
 package co.com.ceiba.estacionamiento.controller;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import co.com.ceiba.estacionamiento.business.Vehiculo;
 import co.com.ceiba.estacionamiento.business.VigilanteService;
 import co.com.ceiba.estacionamiento.business.VigilanteServiceException;
 
@@ -28,17 +28,15 @@ public class EstacionamientoController {
 	
 	@CrossOrigin(origins = "http://localhost:4200")
 	@GetMapping("/estacionamiento/listarVehiculosParqueados")
-	public ResponseEntity<List<VehiculoRequestBody>> listarVehiculosParqueados(@RequestParam(required=false) String placa) {
-		List<VehiculoRequestBody> resultadoVehiculos = new ArrayList<>();
-		servicioVigilante.listarVehiculosParqueados(placa).stream().forEach(vehiculo -> resultadoVehiculos.add(new VehiculoRequestBody(vehiculo)));
-		return new ResponseEntity<>(resultadoVehiculos, HttpStatus.OK);
+	public ResponseEntity<List<Vehiculo>> listarVehiculosParqueados(@RequestParam(required=false) String placa) {
+		return new ResponseEntity<>(servicioVigilante.listarVehiculosParqueados(placa), HttpStatus.OK);
 	}
 	
 	@CrossOrigin(origins = "http://localhost:4200")
 	@PostMapping(value = "/estacionamiento/registrarIngresoVehiculo")
-	public ResponseEntity<List<String>> registrarIngresoVehiculo(@RequestBody VehiculoRequestBody vehiculoBody) {
+	public ResponseEntity<List<String>> registrarIngresoVehiculo(@RequestBody Vehiculo vehiculoBody) {
 		try {
-			servicioVigilante.registrarIngresoVehiculo(vehiculoBody.obtenerVehiculo());
+			servicioVigilante.registrarIngresoVehiculo(vehiculoBody);
 			return new ResponseEntity<>(Arrays.asList("El vehiculo ha sido ingresado"), HttpStatus.OK);
 		} catch (VigilanteServiceException e) {
 			LOGGER.info(e);
@@ -48,7 +46,7 @@ public class EstacionamientoController {
 	
 	@CrossOrigin(origins = "http://localhost:4200")
 	@PostMapping(value = "/estacionamiento/registrarSalidaVehiculo")
-	public ResponseEntity<List<String>> registrarSalidaVehiculo(@RequestBody VehiculoRequestBody vehiculoBody) {
+	public ResponseEntity<List<String>> registrarSalidaVehiculo(@RequestBody Vehiculo vehiculoBody) {
 		try {
 			return new ResponseEntity<>(Arrays.asList(servicioVigilante.registrarSalidaVehiculo(vehiculoBody.getPlaca(), vehiculoBody.getFechaSalida()).toString()), HttpStatus.OK);
 		} catch (VigilanteServiceException e) {

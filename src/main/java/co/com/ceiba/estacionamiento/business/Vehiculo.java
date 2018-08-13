@@ -4,28 +4,45 @@ import java.util.Date;
 
 public class Vehiculo {
 	private String placa;
-	private Integer cilindraje;
 	private TipoVehiculo tipoVehiculo;
+	private Integer cilindraje;
 	private Date fechaIngreso;
+	private Date fechaSalida;
 
-	public Vehiculo(String placa, Integer cilindraje, TipoVehiculo tipoVehiculo, Date fechaIngreso) {
+	public Date getFechaSalida() {
+		return fechaSalida;
+	}
+
+	public Vehiculo(String placa, TipoVehiculo tipoVehiculo, Integer cilindraje, Date fechaIngreso, Date fechaSalida) {
 		super();
 		this.placa = placa;
-		this.cilindraje = cilindraje;
 		this.tipoVehiculo = tipoVehiculo;
+		this.cilindraje = cilindraje;
+		this.fechaIngreso = fechaIngreso;
+		this.fechaSalida = fechaSalida;
+	}
+
+	public Vehiculo() {
+	}
+
+	public Vehiculo(String placa, TipoVehiculo tipoVehiculo, Integer cilindraje, Date fechaIngreso) {
+		super();
+		this.placa = placa;
+		this.tipoVehiculo = tipoVehiculo;
+		this.cilindraje = cilindraje;
 		this.fechaIngreso = fechaIngreso;
 	}
-	
+
 	public String getPlaca() {
 		return placa;
 	}
 
-	public Integer getCilindraje() {
-		return cilindraje;
-	}
-
 	public TipoVehiculo getTipoVehiculo() {
 		return tipoVehiculo;
+	}
+
+	public Integer getCilindraje() {
+		return cilindraje;
 	}
 
 	public Date getFechaIngreso() {

@@ -5,7 +5,6 @@ import java.util.Date;
 import co.com.ceiba.estacionamiento.business.DateUtils;
 import co.com.ceiba.estacionamiento.business.TipoVehiculo;
 import co.com.ceiba.estacionamiento.business.Vehiculo;
-import co.com.ceiba.estacionamiento.controller.VehiculoRequestBody;
 
 public abstract class VehiculoTestDataBuilder {
 	private static final String FECHA_INGRESO = "2018-07-10 10:00";
@@ -46,11 +45,7 @@ public abstract class VehiculoTestDataBuilder {
 	}
 	
 	public Vehiculo build() {
-		return new Vehiculo(this.placa, this.cilindraje, this.tipoVehiculo, this.fechaIngreso);
-	}
-	
-	public VehiculoRequestBody buildBody() {
-		return new VehiculoRequestBody(this.placa, this.tipoVehiculo.toString(), this.cilindraje, this.fechaIngreso, this.fechaSalida);
+		return new Vehiculo(this.placa, this.tipoVehiculo, this.cilindraje, this.fechaIngreso, this.fechaSalida);
 	}
 	
 }

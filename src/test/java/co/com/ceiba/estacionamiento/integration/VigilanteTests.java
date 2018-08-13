@@ -56,11 +56,11 @@ public class VigilanteTests {
 	}  
 	
 	private ResultActions llamarServicioIngresoVehiculo(VehiculoTestDataBuilder vehiculoBuilder) throws Exception {
-		return mockMvc.perform(post(registrarIngreso).content(convertirAJson(vehiculoBuilder.buildBody())).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)).andDo(print());
+		return mockMvc.perform(post(registrarIngreso).content(convertirAJson(vehiculoBuilder.build())).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)).andDo(print());
 	}
 	
 	private ResultActions llamarServicioSalidaVehiculo(VehiculoTestDataBuilder vehiculoBuilder) throws Exception {
-		return mockMvc.perform(post(registrarSalida).content(convertirAJson(vehiculoBuilder.buildBody())).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)).andDo(print());
+		return mockMvc.perform(post(registrarSalida).content(convertirAJson(vehiculoBuilder.build())).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)).andDo(print());
 	}
 
 	private void insertarNVehiculos(VehiculoTestDataBuilder vehiculoBuilder, int n) {
