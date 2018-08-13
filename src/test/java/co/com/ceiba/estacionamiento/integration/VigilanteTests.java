@@ -1,36 +1,49 @@
 package co.com.ceiba.estacionamiento.integration;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
-import java.text.ParseException;
-import java.util.List;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import co.com.ceiba.estacionamiento.builders.CarroTestDataBuilder;
 import co.com.ceiba.estacionamiento.builders.MotoTestDataBuilder;
 import co.com.ceiba.estacionamiento.builders.VehiculoTestDataBuilder;
 import co.com.ceiba.estacionamiento.business.VigilanteService;
 import co.com.ceiba.estacionamiento.business.VigilanteServiceException;
-import co.com.ceiba.estacionamiento.controller.EstacionamientoController;
 import co.com.ceiba.estacionamiento.repository.PrecioRepository;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@AutoConfigureMockMvc
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class VigilanteTests {
 
+	private String listarVehiculos = "/estacionamiento/listarVehiculosParqueados";
+	private String registrarIngreso = "/estacionamiento/registrarIngresoVehiculo";
+	private String registrarSalida = "/estacionamiento/registrarSalidaVehiculo";
+	
 	@Autowired
-    private EstacionamientoController controladorEstacionamiento;
+    private MockMvc mockMvc;
 	
 	@Autowired
 	private VigilanteService servicioVigilante;
@@ -38,6 +51,18 @@ public class VigilanteTests {
 	@Autowired
 	private PrecioRepository repositorioPrecio;
 	
+	private String convertirAJson(final Object obj) throws JsonProcessingException {
+		return new ObjectMapper().writeValueAsString(obj);
+	}  
+	
+	private ResultActions llamarServicioIngresoVehiculo(VehiculoTestDataBuilder vehiculoBuilder) throws Exception {
+		return mockMvc.perform(post(registrarIngreso).content(convertirAJson(vehiculoBuilder.buildBody())).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)).andDo(print());
+	}
+	
+	private ResultActions llamarServicioSalidaVehiculo(VehiculoTestDataBuilder vehiculoBuilder) throws Exception {
+		return mockMvc.perform(post(registrarSalida).content(convertirAJson(vehiculoBuilder.buildBody())).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)).andDo(print());
+	}
+
 	private void insertarNVehiculos(VehiculoTestDataBuilder vehiculoBuilder, int n) {
 		for (int i = 0; i < n; i++) {
 			vehiculoBuilder.conPlaca(vehiculoBuilder.getPrefijoPlaca() + "45" + i);
@@ -45,111 +70,113 @@ public class VigilanteTests {
 		}
 	}
 
-	private void registrarIngresoVehiculoParqueaderoDisponible(VehiculoTestDataBuilder vehiculoBuilder) {
+	private void registrarIngresoVehiculoParqueaderoDisponible(VehiculoTestDataBuilder vehiculoBuilder) throws Exception {
 		servicioVigilante.evacuarVehiculosParqueados();
 		
-		controladorEstacionamiento.registrarIngresoVehiculo(vehiculoBuilder.buildBody());
+		ResultActions ingreso = llamarServicioIngresoVehiculo(vehiculoBuilder);
 		
+		ingreso.andExpect(status().isOk());
 		assertNotNull(servicioVigilante.buscarVehiculoParqueado(vehiculoBuilder.build().getPlaca()));
 	}
 	
 	@Test
-	public void registrarIngresoMotoConParqueaderoDisponibleTest() {
+	public void registrarIngresoMotoConParqueaderoDisponibleTest() throws Exception {
 		registrarIngresoVehiculoParqueaderoDisponible(new MotoTestDataBuilder().conFechaIngreso(null));
 	}
 	
 	@Test
-	public void registrarIngresoCarroConParqueaderoDisponibleTest() {
+	public void registrarIngresoCarroConParqueaderoDisponibleTest() throws Exception {
 		registrarIngresoVehiculoParqueaderoDisponible(new CarroTestDataBuilder().conFechaIngreso(null));
 	}
 	
 	@Test
-	public void registrarIngresoMotoConParqueaderoLlenoTest() {
+	public void registrarIngresoMotoConParqueaderoLlenoTest() throws Exception {
 		servicioVigilante.evacuarVehiculosParqueados();
 		VehiculoTestDataBuilder motoBuilder = new MotoTestDataBuilder();
 		insertarNVehiculos(motoBuilder, 10);
 		motoBuilder.conPlaca("ZTE56D");
 
-		ResponseEntity<List<String>> ingreso = controladorEstacionamiento.registrarIngresoVehiculo(motoBuilder.buildBody());
+		ResultActions ingreso = llamarServicioIngresoVehiculo(motoBuilder);
 		
-		assertEquals(VigilanteServiceException.INDISPONIBILIDAD_PARQUEADERO, ingreso.getBody().get(0));
+		ingreso.andExpect(status().isBadRequest()).andExpect(jsonPath("$[0]", equalTo(VigilanteServiceException.INDISPONIBILIDAD_PARQUEADERO)));
 	}
 
 	@Test
-	public void registrarIngresoCarroConParqueaderoLlenoTest() {
+	public void registrarIngresoCarroConParqueaderoLlenoTest() throws Exception {
 		servicioVigilante.evacuarVehiculosParqueados();
 		VehiculoTestDataBuilder carroBuilder = new CarroTestDataBuilder();
 		insertarNVehiculos(carroBuilder, 20);
 		carroBuilder.conPlaca("ZTE568");
 
-		ResponseEntity<List<String>> ingreso = controladorEstacionamiento.registrarIngresoVehiculo(carroBuilder.buildBody());
+		ResultActions ingreso = llamarServicioIngresoVehiculo(carroBuilder);
 		
-		assertEquals(VigilanteServiceException.INDISPONIBILIDAD_PARQUEADERO, ingreso.getBody().get(0));
+		ingreso.andExpect(status().isBadRequest()).andExpect(jsonPath("$[0]", equalTo(VigilanteServiceException.INDISPONIBILIDAD_PARQUEADERO)));
 	}
 
 	@Test
-	public void registrarIngresoVehiculoPlacaADiaCorrectoTest() {
+	public void registrarIngresoVehiculoPlacaADiaCorrectoTest() throws Exception {
 		registrarIngresoVehiculoParqueaderoDisponible(new CarroTestDataBuilder().conPlaca("ABC854").conFechaIngreso("2018-07-01 09:30"));
 		registrarIngresoVehiculoParqueaderoDisponible(new CarroTestDataBuilder().conPlaca("ABC854").conFechaIngreso("2018-07-02 09:30"));
 	}
 
 	@Test
-	public void registrarIngresoVehiculoPlacaADiaIncorrectoTest() {
+	public void registrarIngresoVehiculoPlacaADiaIncorrectoTest() throws Exception {
 		servicioVigilante.evacuarVehiculosParqueados();
 		VehiculoTestDataBuilder carro = new CarroTestDataBuilder().conPlaca("ABC854").conFechaIngreso("2018-07-03 09:30");
 		
-		ResponseEntity<List<String>> ingreso = controladorEstacionamiento.registrarIngresoVehiculo(carro.buildBody());
+		ResultActions ingreso = llamarServicioIngresoVehiculo(carro);
 		
-		assertEquals(VigilanteServiceException.PLACA_A_DIA_INCORRECTO, ingreso.getBody().get(0));
+		ingreso.andExpect(status().isBadRequest()).andExpect(jsonPath("$[0]", equalTo(VigilanteServiceException.PLACA_A_DIA_INCORRECTO)));
 	}
 	
 	@Test
-	public void registrarIngresoVehiculoIngresadoTest() {
+	public void registrarIngresoVehiculoIngresadoTest() throws Exception {
 		servicioVigilante.evacuarVehiculosParqueados();
 		VehiculoTestDataBuilder carro = new CarroTestDataBuilder();
 		servicioVigilante.registrarIngresoVehiculo(carro.build());
 		
-		ResponseEntity<List<String>> ingreso = controladorEstacionamiento.registrarIngresoVehiculo(carro.buildBody());
+		ResultActions ingreso = llamarServicioIngresoVehiculo(carro);
 		
-		assertEquals(VigilanteServiceException.VEHICULO_YA_INGRESADO, ingreso.getBody().get(0));
+		ingreso.andExpect(status().isBadRequest()).andExpect(jsonPath("$[0]", equalTo(VigilanteServiceException.VEHICULO_YA_INGRESADO)));
 	}
 
 	@Test
-	public void registrarSalidaVehiculoIngresadoTest() throws ParseException {
+	public void registrarSalidaVehiculoIngresadoTest() throws Exception {
 		servicioVigilante.evacuarVehiculosParqueados();
 		VehiculoTestDataBuilder carro = new CarroTestDataBuilder();
 		servicioVigilante.registrarIngresoVehiculo(carro.build());
 		carro.conFechaSalida("2018-07-10 19:35");
 		
-		controladorEstacionamiento.registrarSalidaVehiculo(carro.buildBody());
+		ResultActions salida = llamarServicioSalidaVehiculo(carro);
 
+		salida.andExpect(status().isOk());
 		assertNull(servicioVigilante.buscarVehiculoParqueado(carro.build().getPlaca()));
 	}
 
 	@Test
-	public void registrarSalidaVehiculoNoIngresadoTest() {
+	public void registrarSalidaVehiculoNoIngresadoTest() throws Exception {
 		servicioVigilante.evacuarVehiculosParqueados();
 		VehiculoTestDataBuilder carro = new CarroTestDataBuilder().conFechaSalida("2018-07-10 19:35");
 		
-		ResponseEntity<List<String>> salida = controladorEstacionamiento.registrarSalidaVehiculo(carro.buildBody());
+		ResultActions salida = llamarServicioSalidaVehiculo(carro);
 		
-		assertEquals(VigilanteServiceException.VEHICULO_NO_INGRESADO, salida.getBody().get(0));
+		salida.andExpect(status().isBadRequest()).andExpect(jsonPath("$[0]", equalTo(VigilanteServiceException.VEHICULO_NO_INGRESADO)));
 	}
 	
 	@Test
-	public void registrarSalidaVehiculoSinPrecioConfiguradoTest() {
+	public void registrarSalidaVehiculoSinPrecioConfiguradoTest() throws Exception {
 		servicioVigilante.evacuarVehiculosParqueados();
 		VehiculoTestDataBuilder carro = new CarroTestDataBuilder();
 		servicioVigilante.registrarIngresoVehiculo(carro.build());
 		carro.conFechaSalida("2018-07-10 19:35");
 		repositorioPrecio.deleteAll();
 		
-		ResponseEntity<List<String>> salida = controladorEstacionamiento.registrarSalidaVehiculo(carro.buildBody());
-		
-		assertEquals(VigilanteServiceException.PRECIO_NO_ENCONTRADO, salida.getBody().get(0));
+		ResultActions salida = llamarServicioSalidaVehiculo(carro);
+
+		salida.andExpect(status().isBadRequest()).andExpect(jsonPath("$[0]", equalTo(VigilanteServiceException.PRECIO_NO_ENCONTRADO)));
 	}
 	
-	private void registrarSalidaVehiculoGenerico(VehiculoTestDataBuilder vehiculoBuilder, String fechaSalida, boolean cilindrajeSuperior, String valorEsperado) {
+	private void registrarSalidaVehiculoGenerico(VehiculoTestDataBuilder vehiculoBuilder, String fechaSalida, boolean cilindrajeSuperior, String valorEsperado) throws Exception {
 		servicioVigilante.evacuarVehiculosParqueados();
 		if (cilindrajeSuperior) {
 			vehiculoBuilder.conCilindraje(650);
@@ -157,75 +184,75 @@ public class VigilanteTests {
 		servicioVigilante.registrarIngresoVehiculo(vehiculoBuilder.build());
 		vehiculoBuilder.conFechaSalida(fechaSalida);
 		
-		ResponseEntity<List<String>> salida = controladorEstacionamiento.registrarSalidaVehiculo(vehiculoBuilder.buildBody());
+		ResultActions salida = llamarServicioSalidaVehiculo(vehiculoBuilder);
 		
-		assertEquals(valorEsperado, salida.getBody().get(0));
+		salida.andExpect(status().isOk()).andExpect(jsonPath("$[0]", equalTo(valorEsperado)));
 	}
 	
-	private void registrarSalidaVehiculoGenerico(VehiculoTestDataBuilder vehiculoBuilder, String fechaSalida, String valorEsperado) {
+	private void registrarSalidaVehiculoGenerico(VehiculoTestDataBuilder vehiculoBuilder, String fechaSalida, String valorEsperado) throws Exception {
 		registrarSalidaVehiculoGenerico(vehiculoBuilder, fechaSalida, false, valorEsperado);
 	}
 	
 	@Test
-	public void registrarSalidaCarroCobrandoDiaTest() {
+	public void registrarSalidaCarroCobrandoDiaTest() throws Exception {
 		registrarSalidaVehiculoGenerico(new CarroTestDataBuilder(), "2018-07-10 19:35", "8000.00");
 	}
 
 	@Test
-	public void registrarSalidaCarroCobrandoHorasTest() {
+	public void registrarSalidaCarroCobrandoHorasTest() throws Exception {
 		registrarSalidaVehiculoGenerico(new CarroTestDataBuilder(), "2018-07-10 13:48", "4000.00");
 	}
 
 	@Test
-	public void registrarSalidaCarroCobrandoDiasHorasTest() {
+	public void registrarSalidaCarroCobrandoDiasHorasTest() throws Exception {
 		registrarSalidaVehiculoGenerico(new CarroTestDataBuilder(), "2018-07-11 12:50", "11000.00");
 	}
 	
 	@Test
-	public void registrarSalidaCarroCobrandoDiasConDiaAdicionalTest() {
+	public void registrarSalidaCarroCobrandoDiasConDiaAdicionalTest() throws Exception {
 		registrarSalidaVehiculoGenerico(new CarroTestDataBuilder(), "2018-07-11 19:49", "16000.00");
 	}
 
 	@Test
-	public void registrarSalidaMotoCilindrajeInferiorCobrandoDiaTest() {
+	public void registrarSalidaMotoCilindrajeInferiorCobrandoDiaTest() throws Exception {
 		registrarSalidaVehiculoGenerico(new MotoTestDataBuilder(), "2018-07-10 19:35", "4000.00");
 	}
 
 	@Test
-	public void registrarSalidaMotoCilindrajeInferiorCobrandoHorasTest() {
+	public void registrarSalidaMotoCilindrajeInferiorCobrandoHorasTest() throws Exception {
 		registrarSalidaVehiculoGenerico(new MotoTestDataBuilder(), "2018-07-10 13:48", "2000.00");
 	}
 
 	@Test
-	public void registrarSalidaMotoCilindrajeInferiorCobrandoDiasHorasTest() {
+	public void registrarSalidaMotoCilindrajeInferiorCobrandoDiasHorasTest() throws Exception {
 		registrarSalidaVehiculoGenerico(new MotoTestDataBuilder(), "2018-07-11 13:50", "6000.00");
 	}
 
 	@Test
-	public void registrarSalidaMotoCilindrajeSuperiorCobrandoDiaTest() {
+	public void registrarSalidaMotoCilindrajeSuperiorCobrandoDiaTest() throws Exception {
 		registrarSalidaVehiculoGenerico(new MotoTestDataBuilder(), "2018-07-10 19:35", true, "6000.00");
 	}
 
 	@Test
-	public void registrarSalidaMotoCilindrajeSuperiorCobrandoHorasTest() {
+	public void registrarSalidaMotoCilindrajeSuperiorCobrandoHorasTest() throws Exception {
 		registrarSalidaVehiculoGenerico(new MotoTestDataBuilder(), "2018-07-10 13:48", true, "4000.00");
 	}
 
 	@Test
-	public void registrarSalidaMotoCilindrajeSuperiorCobrandoDiasHorasTest() {
+	public void registrarSalidaMotoCilindrajeSuperiorCobrandoDiasHorasTest() throws Exception {
 		registrarSalidaVehiculoGenerico(new MotoTestDataBuilder(), "2018-07-11 13:50", true, "8000.00");
 	}
 	
 	@Test
-	public void listarVehiculosParqueadosTest() {
+	public void listarVehiculosParqueadosTest() throws Exception {
 		servicioVigilante.evacuarVehiculosParqueados();
 		VehiculoTestDataBuilder vehiculoBuilder = new CarroTestDataBuilder();
 		insertarNVehiculos(vehiculoBuilder, 6);
 		vehiculoBuilder = new MotoTestDataBuilder();
 		servicioVigilante.registrarIngresoVehiculo(vehiculoBuilder.build());
 		
-		assertEquals(7, controladorEstacionamiento.listarVehiculosParqueados(null).getBody().size());
-		assertEquals(1, controladorEstacionamiento.listarVehiculosParqueados("BCD98E").getBody().size());
+		mockMvc.perform(get(listarVehiculos)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(7)));
+		mockMvc.perform(get(listarVehiculos).param("placa", "BCD98E")).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)));
 	}
 	
 }

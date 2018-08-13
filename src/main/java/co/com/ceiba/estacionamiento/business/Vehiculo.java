@@ -16,14 +16,6 @@ public class Vehiculo {
 		this.fechaIngreso = fechaIngreso;
 	}
 	
-	public Vehiculo(String placa, Integer cilindraje, TipoVehiculo tipoVehiculo, String fechaIngreso) {
-		super();
-		this.placa = placa;
-		this.cilindraje = cilindraje;
-		this.tipoVehiculo = tipoVehiculo;
-		this.fechaIngreso = DateUtils.convertirTextoAFecha(fechaIngreso);
-	}
-
 	public String getPlaca() {
 		return placa;
 	}

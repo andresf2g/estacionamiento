@@ -25,10 +25,6 @@ public final class DateUtils {
 		}
 	}
 
-	public static String convertirFechaATexto(Date fecha) {
-		return DateUtils.formatoFecha().format(fecha);
-	}
-	
 	public static TiempoEstadia obtenerTiempoEstadia(Date fechaIngreso, Date fechaSalida) {
 		long timeDifference = fechaSalida.getTime() - fechaIngreso.getTime();
 		int hours = (int) Math.ceil(((double) timeDifference) / 1000 / 60 / 60);

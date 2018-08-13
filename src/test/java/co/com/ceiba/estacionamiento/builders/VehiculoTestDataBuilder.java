@@ -2,8 +2,8 @@ package co.com.ceiba.estacionamiento.builders;
 
 import java.util.Date;
 
-import co.com.ceiba.estacionamiento.business.TipoVehiculo;
 import co.com.ceiba.estacionamiento.business.DateUtils;
+import co.com.ceiba.estacionamiento.business.TipoVehiculo;
 import co.com.ceiba.estacionamiento.business.Vehiculo;
 import co.com.ceiba.estacionamiento.controller.VehiculoRequestBody;
 
@@ -52,4 +52,5 @@ public abstract class VehiculoTestDataBuilder {
 	public VehiculoRequestBody buildBody() {
 		return new VehiculoRequestBody(this.placa, this.tipoVehiculo.toString(), this.cilindraje, this.fechaIngreso, this.fechaSalida);
 	}
+	
 }
