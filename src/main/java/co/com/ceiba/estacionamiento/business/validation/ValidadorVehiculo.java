@@ -5,7 +5,7 @@ import java.util.List;
 
 public abstract class ValidadorVehiculo {
 	protected List<ValidacionVehiculo> listaValidaciones = new ArrayList<>();
-	
+
 	public List<ValidacionVehiculo> obtenerValidaciones() {
 		return this.listaValidaciones;
 	}

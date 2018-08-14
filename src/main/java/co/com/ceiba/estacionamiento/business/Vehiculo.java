@@ -49,4 +49,12 @@ public class Vehiculo {
 		return fechaIngreso;
 	}
 
+	public void setFechaIngreso(Date fechaIngreso) {
+		this.fechaIngreso = fechaIngreso;
+	}
+
+	public void setFechaSalida(Date fechaSalida) {
+		this.fechaSalida = fechaSalida;
+	}
+
 }

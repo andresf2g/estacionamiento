@@ -8,7 +8,8 @@ public class ValidadorIngresoVehiculo extends ValidadorVehiculo {
 
 	public ValidadorIngresoVehiculo(VehiculoRepository repositorioVehiculo) {
 		super.listaValidaciones = Arrays.asList(new DiaCorrectoParaVehiculoPlacaA(),
-				new DisponibilidadEstacionamiento(repositorioVehiculo), new VehiculoEstacionado(repositorioVehiculo)); 
+				new DisponibilidadEstacionamiento(repositorioVehiculo), new VehiculoNoEstacionado(repositorioVehiculo),
+				new FechaIngresoNoNula());
 	}
-	
+
 }

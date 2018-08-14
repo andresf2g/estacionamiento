@@ -98,7 +98,7 @@ public class VigilanteTests {
 
 		ResultActions ingreso = llamarServicioIngresoVehiculo(motoBuilder);
 		
-		ingreso.andExpect(status().isBadRequest()).andExpect(jsonPath("$[0]", equalTo(VigilanteServiceException.INDISPONIBILIDAD_PARQUEADERO)));
+		ingreso.andExpect(status().isBadRequest()).andExpect(jsonPath("$[0]", equalTo(VigilanteServiceException.INDISPONIBILIDAD_ESTACIONAMIENTO)));
 	}
 
 	@Test
@@ -110,7 +110,7 @@ public class VigilanteTests {
 
 		ResultActions ingreso = llamarServicioIngresoVehiculo(carroBuilder);
 		
-		ingreso.andExpect(status().isBadRequest()).andExpect(jsonPath("$[0]", equalTo(VigilanteServiceException.INDISPONIBILIDAD_PARQUEADERO)));
+		ingreso.andExpect(status().isBadRequest()).andExpect(jsonPath("$[0]", equalTo(VigilanteServiceException.INDISPONIBILIDAD_ESTACIONAMIENTO)));
 	}
 
 	@Test
@@ -145,7 +145,6 @@ public class VigilanteTests {
 		servicioVigilante.evacuarVehiculosParqueados();
 		VehiculoTestDataBuilder carro = new CarroTestDataBuilder();
 		servicioVigilante.registrarIngresoVehiculo(carro.build());
-		carro.conFechaSalida("2018-07-10 19:35");
 		
 		ResultActions salida = llamarServicioSalidaVehiculo(carro);
 

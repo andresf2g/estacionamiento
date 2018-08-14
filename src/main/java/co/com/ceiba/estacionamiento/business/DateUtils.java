@@ -21,7 +21,7 @@ public final class DateUtils {
 			return DateUtils.formatoFecha().parse(fecha);
 		} catch (Exception e) {
 			LOGGER.info(e);
-			return new Date();
+			return null;
 		}
 	}
 
@@ -37,6 +37,10 @@ public final class DateUtils {
 			return new TiempoEstadia(hours / 24, hours - ((hours / 24) * 24));
 		}
 		return new TiempoEstadia(0, hours);
+	}
+	
+	public static Date obtenerFechaActual() {
+		return new Date();
 	}
 
 }

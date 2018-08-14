@@ -20,19 +20,18 @@ import co.com.ceiba.estacionamiento.business.VigilanteService;
 import co.com.ceiba.estacionamiento.business.VigilanteServiceException;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 public class EstacionamientoController {
 	private static final Log LOGGER = LogFactory.getLog(EstacionamientoController.class);
 	
 	@Autowired
 	private VigilanteService servicioVigilante;
 	
-	@CrossOrigin(origins = "http://localhost:4200")
 	@GetMapping("/estacionamiento/listarVehiculosParqueados")
 	public ResponseEntity<List<Vehiculo>> listarVehiculosParqueados(@RequestParam(required=false) String placa) {
 		return new ResponseEntity<>(servicioVigilante.listarVehiculosParqueados(placa), HttpStatus.OK);
 	}
 	
-	@CrossOrigin(origins = "http://localhost:4200")
 	@PostMapping(value = "/estacionamiento/registrarIngresoVehiculo")
 	public ResponseEntity<List<String>> registrarIngresoVehiculo(@RequestBody Vehiculo vehiculoBody) {
 		try {
@@ -44,11 +43,10 @@ public class EstacionamientoController {
 		}
 	}
 	
-	@CrossOrigin(origins = "http://localhost:4200")
 	@PostMapping(value = "/estacionamiento/registrarSalidaVehiculo")
 	public ResponseEntity<List<String>> registrarSalidaVehiculo(@RequestBody Vehiculo vehiculoBody) {
 		try {
-			return new ResponseEntity<>(Arrays.asList(servicioVigilante.registrarSalidaVehiculo(vehiculoBody.getPlaca(), vehiculoBody.getFechaSalida()).toString()), HttpStatus.OK);
+			return new ResponseEntity<>(Arrays.asList(servicioVigilante.registrarSalidaVehiculo(vehiculoBody).toString()), HttpStatus.OK);
 		} catch (VigilanteServiceException e) {
 			LOGGER.info(e);
 			return new ResponseEntity<>(Arrays.asList(e.getMessage()), HttpStatus.BAD_REQUEST);
