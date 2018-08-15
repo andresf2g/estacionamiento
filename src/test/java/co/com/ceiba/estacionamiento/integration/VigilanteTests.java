@@ -141,6 +141,13 @@ public class VigilanteTests {
 	}
 
 	@Test
+	public void registrarVehiculoConExcepcionInternaTest() throws Exception {
+		ResultActions registro = llamarServicioIngresoVehiculo(new CarroTestDataBuilder().conPlaca(null));
+		
+		registro.andExpect(status().isInternalServerError());
+	}
+	
+	@Test
 	public void registrarSalidaVehiculoIngresadoTest() throws Exception {
 		servicioVigilante.evacuarVehiculosParqueados();
 		VehiculoTestDataBuilder carro = new CarroTestDataBuilder();

@@ -15,9 +15,11 @@ public class FechaSalidaNoNula implements ValidacionVehiculo {
 
 	@Override
 	public void validar(Vehiculo vehiculo) {
-		vehiculo.setFechaSalida(fechaSalida);
-		if (vehiculo.getFechaSalida() == null) {
-			vehiculo.setFechaSalida(DateUtils.obtenerFechaActual());
+		if (vehiculo != null) {
+			vehiculo.setFechaSalida(fechaSalida);
+			if (vehiculo.getFechaSalida() == null) {
+				vehiculo.setFechaSalida(DateUtils.obtenerFechaActual());
+			}
 		}
 	}
 
