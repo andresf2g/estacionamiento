@@ -6,7 +6,7 @@ import java.util.Date;
 public class ValidadorSalidaVehiculo extends ValidadorVehiculo {
 
 	public ValidadorSalidaVehiculo(Date fechaSalida) {
-		super.listaValidaciones = Arrays.asList(new VehiculoEstacionado(), new FechaSalidaNoNula(fechaSalida));
+		super.listaValidaciones = Arrays.asList(new FechaSalidaNoNula(fechaSalida), new VehiculoEstacionado());
 	}
 
 }
