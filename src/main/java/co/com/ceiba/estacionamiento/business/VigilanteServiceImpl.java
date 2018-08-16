@@ -5,35 +5,41 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import co.com.ceiba.estacionamiento.business.price.PrecioEstacionamiento;
-import co.com.ceiba.estacionamiento.business.validation.ValidadorIngresoVehiculo;
-import co.com.ceiba.estacionamiento.business.validation.ValidadorSalidaVehiculo;
+import co.com.ceiba.estacionamiento.business.validation.ValidacionVehiculo;
 import co.com.ceiba.estacionamiento.model.VehiculoBuilder;
 import co.com.ceiba.estacionamiento.model.VehiculoEntity;
-import co.com.ceiba.estacionamiento.repository.PrecioRepository;
 import co.com.ceiba.estacionamiento.repository.VehiculoRepository;
 
-@Service
 public class VigilanteServiceImpl implements VigilanteService {
-	@Autowired
+
 	private VehiculoRepository repositorioVehiculo;
-	@Autowired
-	private PrecioRepository repositorioPrecio;
+
+	private List<ValidacionVehiculo> validacionesIngreso;
+	private List<ValidacionVehiculo> validacionesSalida;
+	private PrecioEstacionamiento precioEstacionamiento;
+
+	public VigilanteServiceImpl(VehiculoRepository repositorioVehiculo, List<ValidacionVehiculo> validacionesIngreso,
+			List<ValidacionVehiculo> validacionesSalida, PrecioEstacionamiento precioEstacionamiento) {
+		this.repositorioVehiculo = repositorioVehiculo;
+		this.validacionesIngreso = validacionesIngreso;
+		this.validacionesSalida = validacionesSalida;
+		this.precioEstacionamiento = precioEstacionamiento;
+	}
 
 	public void registrarIngresoVehiculo(Vehiculo vehiculo) {
-		new ValidadorIngresoVehiculo(repositorioVehiculo).obtenerValidaciones().forEach(validador -> validador.validar(vehiculo));
+		// dozer
+		// JDBI
+		validacionesIngreso.forEach(validador -> validador.validar(vehiculo));
 		repositorioVehiculo.save(VehiculoBuilder.convertirAEntity(vehiculo));
 	}
 
 	public BigDecimal registrarSalidaVehiculo(Vehiculo vehiculo) {
+		validacionesSalida.forEach(validador -> validador.validar(vehiculo));
 		Vehiculo vehiculoEstacionado = buscarVehiculoParqueado(vehiculo.getPlaca());
-		new ValidadorSalidaVehiculo(vehiculo.getFechaSalida()).obtenerValidaciones().forEach(validador -> validador.validar(vehiculoEstacionado));
-		TiempoEstadia tiempoEstadia = DateUtils.obtenerTiempoEstadia(vehiculoEstacionado.getFechaIngreso(), vehiculoEstacionado.getFechaSalida());
-		BigDecimal valorPagar = new PrecioEstacionamiento(repositorioPrecio, tiempoEstadia).calcularTotal(vehiculoEstacionado);
-		repositorioVehiculo.deleteById(vehiculoEstacionado.getPlaca());
+		TiempoEstadia tiempoEstadia = DateUtils.obtenerTiempoEstadia(vehiculoEstacionado.getFechaIngreso(), vehiculo.getFechaSalida());
+		BigDecimal valorPagar = precioEstacionamiento.calcularTotal(tiempoEstadia, vehiculo);
+		repositorioVehiculo.deleteById(vehiculo.getPlaca());
 		return valorPagar;
 	}
 
